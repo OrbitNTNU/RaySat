@@ -6,23 +6,22 @@
 
 // put function declarations here:
 int myFunction(int, int);
+DataObject tester;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   Serial.println("Initializing...");
-  // // Wire.begin();
-  // int result = myFunction(2, 3);
-  // setup_pressure();
-  setup_sdCard();
+  sdSystemInit();
+  Serial.println("----------------------");
+  tester.init("testma",2);
+  // tester.fileWrite("TESTER");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // double pressure = read_pressure();
-  // Serial.print("Pressure: ");
-  // Serial.println(pressure);
-  delay(1000);
+  // Serial.println(tester.name);
+  delay(10);
 }
 
 // put function definitions here:

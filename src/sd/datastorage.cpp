@@ -1,106 +1,64 @@
 #include <SD.h>
 #include <SPI.h>
+#include <sd/datastorage.h>
 
-File myFile;
+Sd2Card card;
+SdVolume volume;
+SdFile root;
+const int chipSelect = 10;
 
-class FileObject {
-  public:
-    String name;
-    int index;
-    int datatype;
-    int fileWrite(String txt);
-    //int getTime();
-    // Constructor
-    FileObject(String fileObjectName, int fileObjectDataType){
-      datatype = fileObjectDataType;
-      name = fileObjectName;
-      mkDir(name);
-      index = 0;
+void sdSystemInit() {
+    Serial.println("----------------------");
+    Serial.println("Initialising SD card");
+    if (!card.init(SPI_HALF_SPEED, chipSelect)) {
+        Serial.println("initialization failed. Things to check:");
+        Serial.println("* is a card inserted?");
+        Serial.println("* is your wiring correct?");
+        Serial.println("* did you change the chipSelect pin to match your shield or module?");
+        while(1);
+    } else {
+        Serial.println("Wiring is correct and a card is present.");
     }
-  private:
-    void newFile();
-    File openFile();
-};
-
-void mkDir(String dirname) {
-  if (dirExists(dirname)) {
-    return;
-  }
-  
-  else if (!dirExists(dirname)) {
-    SD.mkdir(dirname);
-  }
+    if (!volume.init(card)) {
+        Serial.println("Could not find FAT16/FAT32 patrition. \nMake sure you've formated the card");
+    }
+    root.openRoot(volume);
+    root.ls(LS_R | LS_DATE | LS_SIZE);
+    root.close();
+    if (!SD.begin(10)) {
+        Serial.println(F("SD CARD FAILED, OR NOT PRESENT!"));
+        while (1); // don't do anything more:
+    }
 }
 
-bool dirExists(String dirname){
-  return SD.exists(dirname);
+void DataObject::init(String dataObjectName, int dataObjectType) {
+    Serial.println("----------------------");
+    Serial.println("Initialising data storage: " + dataObjectName);
+    name = dataObjectName;
+    datatype = dataObjectType;
+    index=0;
+    _lineCount = 0;
+}
+void DataObject::newFile() {
+    index++;
+    _lineCount = 0;
 }
 
-// TODO: get time stamp
-// TODO: Maybe add datatype to what will be printed
-int FileObject::fileWrite(String txt) {
-  
-  File file = openFile();
-  
-
-  file.println(txt);
-  
-
-  file.close();
+// TODO: add timestamp system
+int DataObject::fileWrite(String txt) {
+    // Serial.println(path);
+    String path = name+"/"+name+String(index)+".txt";
+    File file = SD.open(path, FILE_WRITE);
+    if (file) {
+        file.println(txt);
+        _lineCount++;
+        if (_lineCount >= 1000) {
+            newFile();
+        }
+        file.close();
+    } else {
+        Serial.println("error opening the file when trying to write");
+        return 1;
+    }
+    return 0;
 }
-
-void FileObject::newFile() {
-  index++;
-}
-
-File FileObject::openFile() {
-  File file = SD.open("/"+name+"/"+name + String(index)+".txt", FILE_WRITE);
-  return file;
-}
-
-
-// void setup_sdCard() {
-//   // Open serial communications and wait for port to open:
-//   while (!Serial) {
-//     ; // wait for serial port to connect. Needed for native USB port only
-//   }
-//   Serial.print("Initializing SD card...");
-
-//   if (!SD.begin(10)) {
-//     Serial.println("initialization failed!");
-//     while (1);
-//   }
-//   Serial.println("initialization done.");
-
-//   // open the file. note that only one file can be open at a time,
-//   // so you have to close this one before opening another.
-//   myFile = SD.open("test.txt", FILE_WRITE);
-
-//   // if the file opened okay, write to it:
-//   if (myFile) {
-//     Serial.print("Writing to test.txt...");
-//     myFile.println("testing 1, 2, 3.");
-//     // close the file:
-//     myFile.close();
-//     Serial.println("done.");
-//   } else {
-//     // if the file didn't open, print an error:
-//     Serial.println("error opening test.txt");
-//   }
-
-//   // re-open the file for reading:
-//   myFile = SD.open("test.txt");
-//   if (myFile) {
-//     Serial.println("test.txt:");
-
-//     // read from the file until there's nothing else in it:
-//     while (myFile.available()) {
-//       Serial.write(myFile.read());
-//     }
-//     // close the file:
-//     myFile.close();
-//   } else {
-//     // if the file didn't open, print an error:
-//     Serial.println("error opening test.txt");
-//   }
-// }
