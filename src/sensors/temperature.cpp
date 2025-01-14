@@ -25,6 +25,6 @@ int setup_temperature() {
 
 float read_temperature() {
     float c = tempsensor.readTempC();
-    Serial.println(c);
+    // Serial.println(c);
     return c;
 }
