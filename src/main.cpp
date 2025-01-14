@@ -7,7 +7,7 @@
 
 // put function declarations here:
 int myFunction(int, int);
-DataObject tester;
+DataObject temperature;
 
 void setup() {
   // put your setup code here, to run once:
@@ -15,7 +15,7 @@ void setup() {
   Serial.println("Initializing...");
   sdSystemInit();
   Serial.println("----------------------");
-  tester.init("testma",2);
+  temperature.init("temper",2);
   // tester.fileWrite("TESTER");
   setup_temperature();
 }
@@ -25,7 +25,8 @@ void loop() {
   // double pressure = read_pressure();
   // Serial.print("Pressure: ");
   // Serial.println(pressure);
-  read_temperature();
+  float temp = read_temperature();
+  temperature.fileWrite(String(temp));
   delay(1000);
 }
 
