@@ -2,6 +2,7 @@
 #include <Wire.h>
 // local libraries
 #include "sensors/pressure.h"
+#include "sensors/temperature.h"
 #include "sd/datastorage.h"
 
 // put function declarations here:
@@ -16,12 +17,16 @@ void setup() {
   Serial.println("----------------------");
   tester.init("testma",2);
   // tester.fileWrite("TESTER");
+  setup_temperature();
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // Serial.println(tester.name);
-  delay(10);
+  // double pressure = read_pressure();
+  // Serial.print("Pressure: ");
+  // Serial.println(pressure);
+  read_temperature();
+  delay(1000);
 }
 
 // put function definitions here:
