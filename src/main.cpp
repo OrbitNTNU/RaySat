@@ -3,9 +3,9 @@
 // local libraries
 #include "sensors/pressure.h"
 #include "sd/datastorage.h"
+#include "radio/radio.h"
 
-// put function declarations here:
-int myFunction(int, int);
+Radio radio;
 
 void setup() {
   // put your setup code here, to run once:
@@ -14,7 +14,8 @@ void setup() {
   // // Wire.begin();
   // int result = myFunction(2, 3);
   // setup_pressure();
-  setup_sdCard();
+  // setup_sdCard();
+  radio.setup();
 }
 
 void loop() {
@@ -23,9 +24,5 @@ void loop() {
   // Serial.print("Pressure: ");
   // Serial.println(pressure);
   delay(1000);
-}
-
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  radio.loop();
 }
