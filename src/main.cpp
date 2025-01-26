@@ -3,12 +3,14 @@
 // local libraries
 #include "sensors/pressure.h"
 #include "sensors/temperature.h"
+#include "sensors/uv.h"
 #include "sd/datastorage.h"
 
 // put function declarations here:
 int myFunction(int, int);
 DataObject temperature;
 DataObject pressure;
+DataObject ultraviolet;
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,11 +18,12 @@ void setup() {
   Serial.println("Initializing...");
   sdSystemInit();
   Serial.println("----------------------");
-  // tester.fileWrite("TESTER");
   setup_temperature();
   temperature.init("temper",2);
   setup_pressure();
   pressure.init("pressu",2);
+  setup_uv();
+  ultraviolet.init("violet",2);
 }
 
 void loop() {
@@ -28,11 +31,21 @@ void loop() {
   // double pressure = read_pressure();
   // Serial.print("Pressure: ");
   // Serial.println(pressure);
-  float temp = read_temperature();
-  temperature.fileWrite(String(temp));
-  float pressu = read_pressure();
-  Serial.println(pressu);
-  pressure.fileWrite(String(pressu));
+
+  // --------------------- Sensor ----------------------
+  // Temperature
+  // float temp = read_temperature(); 
+  // temperature.fileWrite(String(temp));
+  //Serial.print("Temperature: ");Serial.println(temp);
+  // Pressure
+  // float pressu = read_pressure(); 
+  // pressure.fileWrite(String(pressu));
+  //Serial.print("Pressure: ");Serial.println(pressu);
+  // UV
+  // uint32_t uv = read_uv();
+  // ultraviolet.fileWrite(String(uv));
+  // Serial.print("UV: ");Serial.println(String(uv));
+
   delay(1000);
 }
 

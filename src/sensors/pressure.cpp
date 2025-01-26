@@ -16,6 +16,6 @@ int setup_pressure() {
 
 float read_pressure() {
   float pressure_hPa = mpr.readPressure();
-  Serial.print("Pressure (hPa): "); Serial.println(pressure_hPa);
+  // Serial.print("Pressure (hPa): "); Serial.println(pressure_hPa);
   return pressure_hPa;
 }
