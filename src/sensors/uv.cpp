@@ -26,6 +26,7 @@ int setup_uv() {
     ltr.setResolution(LTR390_RESOLUTION_16BIT);
     ltr.setThresholds(100,1000);
     ltr.configInterrupt(true, LTR390_MODE_UVS);  
+    return 0;
 }
 // BUG: the uv sensor won't give out data and reverts itself
 void get_uv_sensor_info() {
