@@ -5,7 +5,10 @@
 #include "sensors/temperature.h"
 #include "sensors/uv.h"
 #include "sensors/gyro.h"
+#include "sensors/ozone.h"
 #include "sd/datastorage.h"
+
+// #include "sensors/scanner.h"
 
 // put function declarations here:
 int myFunction(int, int);
@@ -31,6 +34,7 @@ void setup() {
   // ultraviolet.init("violet",2);
   // calibrate_gyro(2000, gyro_calibrated_x, gyro_calibrated_y, gyro_calibrated_z);
   // Serial.print("Gyroverdier: "); Serial.print(gyro_calibrated_x);Serial.print(gyro_calibrated_y);Serial.print(gyro_calibrated_z);
+  setup_ozone();
 }
 
 void loop() {
@@ -55,9 +59,9 @@ void loop() {
   // float x;
   // float y;
   // float z;
-  // read_gyro(x,y,z,gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);
-  
+  // read_gyro(x,y,z,gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);  
   // Serial.print("Gyro: "); Serial.println(x); Serial.print(y); Serial.println(z);
+  read_ozone();
   delay(1000);
 }
 
