@@ -12,9 +12,13 @@
 
 // put function declarations here:
 int myFunction(int, int);
-DataObject temperature;
+DataObject temperatureOutdoors;
+DataObject temperatureInndoors;
 DataObject pressure;
 DataObject ultraviolet;
+
+TempSensor tempOutdoors;
+TempSensor tempIndoors;
 
 float gyro_calibrated_x;
 float gyro_calibrated_y;
@@ -28,13 +32,15 @@ void setup() {
   // Serial.println("----------------------");
   // setup_temperature();
   // temperature.init("temper",2);
+  tempOutdoors.init(0x48);
+  tempIndoors.init(0x49);
   // setup_pressure();
   // pressure.init("pressu",2);
   // setup_uv();
   // ultraviolet.init("violet",2);
   // calibrate_gyro(2000, gyro_calibrated_x, gyro_calibrated_y, gyro_calibrated_z);
   // Serial.print("Gyroverdier: "); Serial.print(gyro_calibrated_x);Serial.print(gyro_calibrated_y);Serial.print(gyro_calibrated_z);
-  setup_ozone();
+  // setup_ozone();
 }
 
 void loop() {
@@ -61,7 +67,9 @@ void loop() {
   // float z;
   // read_gyro(x,y,z,gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);  
   // Serial.print("Gyro: "); Serial.println(x); Serial.print(y); Serial.println(z);
-  read_ozone();
+  Serial.print("Temperature: Indoors: ");Serial.print(tempIndoors.read()); Serial.print(" Outdoors: "); Serial.println(tempOutdoors.read());
+
+  // read_ozone();
   delay(1000);
 }
 
