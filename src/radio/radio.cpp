@@ -1,45 +1,214 @@
 #include "radio.h"
 
-void Radio::setup()
-{
-    radioSerial.begin(38400);
+std::vector<String> GNSS_Commands = {
+    "baud 9600",
+    "port1 nmea",
+    "p1-out none",
+    "p1-rfilter none",
+    "p1-pfilter none",
+    "verbose 3"};
+
+std::vector<String> setupCommands = {
+    "access always",
+    "power high",
+    "mycall LA3JPA-11", // Må endres
+    "path",
+    "mice-cmt Orbit NTNU VHF test, \\vV \\tC HDOP\\h",
+    "mice-cmtint 3",
+    "mice-msg 7",
+    "mice-symbol /O",
+    "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ngham\\nport-rf-mute 0",
+    "autoexec-int 60", //+ aprsIntervalString,
+    "baud1 9600",
+    "port1 nmea",
+    "p1-out none",
+    "p1-rfilter none",
+    "p1-pfilter none",
+    "port0 ngham-spp" // bør endres
+};
+
+void Radio::write(const String& message){
+    Serial2.print(message);
 }
 
 void Radio::sendCtrlC()
 {
-    radioSerial.print("\x03\n");
-    mode = RadioMode::setting;
+    radioSerial.print("\x03\n"); // Prints Ctrl + C to radio
 }
 
-void Radio::enterTransmitMode()
+void Radio::enterSettingMode() // Function to enter configuration mode
+{
+    if (mode != RadioMode::setting)
+    {
+        sendCtrlC();
+        delay(600);
+        mode = RadioMode::setting; // Sets mode to settings
+    }
+    else
+    {
+        Serial.println("Already in setting mode");
+    }
+}
+
+void Radio::enterTransmitMode() // Function to enter transmit mode from settings mode (to recieve and send messages)
+{
+    if (mode != RadioMode::transmit)
+    {
+        if (mode == RadioMode::unknown) // If mode is unknown, enter settings mode
+        {
+            enterSettingMode();
+        }
+        radioSerial.println("set"); // Prints "set" to radio to get back to transmit
+        delay(300);
+        mode = RadioMode::transmit; // Sets mode to transmit
+        String response = readFromRadio();
+        if (response.indexOf(">") >= 0) // Sjekker om radioen returnerer en forventet respons
+        {
+            mode = RadioMode::transmit;
+            Serial.println("Radio set to transmit mode");
+        }
+        else
+        {
+            Serial.println("Error: Radio did not respond correctly");
+        }
+    }
+    else
+    {
+        Serial.println("Already in transmit mode");
+    }
+}
+
+void Radio::setMode(RadioMode desiredMode)
+{
+    if (mode != desiredMode)
+    {
+        if (desiredMode == RadioMode::setting)
+        {
+            enterSettingMode();
+        }
+        else if (desiredMode == RadioMode::transmit)
+        {
+            enterTransmitMode();
+        }
+    }
+}
+
+// String Radio::setUserMode(String input) {
+//     if (input == "setting")
+// }
+
+String Radio::readFromRadio() // Function for reading from radio
+{
+    if (radioSerial.available()) // If the radio-port is available, read from it)
+    {
+        String response = radioSerial.readString();
+        if (response.indexOf("cmd_inv") >= 0)
+        {
+            Serial.println("cmd_inv: Radio is in the wrong mode or the commando is invalid.");
+            return "";
+        }
+
+        Serial.println("Radio answered: " + response);
+        return response;
+    }
+    else
+    {
+        Serial.println("Uart not available or no data to send"); // If not available, it is probably disconnected}
+        return "";
+    }
+}
+
+void Radio::sendMessage(String message)
+{
+    enterTransmitMode();
+    radioSerial.println(message);
+}
+
+// void Radio::sendSetup()
+// {
+//     radioSerial.println("freq 145500000");
+//     radioSerial.println("access always")
+//     radioSerial.println("")
+// }
+
+/*
+void Radio::menu() {
+        while (1) {
+            Serial.println("1. Enter settings mode");
+            Serial.println("2. Enter transmit mode");
+            Serial.println("3. Send message");
+            Serial.println("4. Read message");
+            Serial.println("5. Read from sensor")
+
+        while (Serial.available() == 0) {
+        }
+
+        int menuChoice = Serial.parseInt();
+
+        switch (menuChoice)
+        {
+        case 1:
+            enterSettingMode();
+            break;
+        case 2:
+            enterTransmitMode();
+            break;
+        case 3:
+            String message =
+            sendMessage();
+            break;
+        default:
+            return;
+            break;
+        }
+
+        }
+    }
+*/
+
+String Radio::getModeString(RadioMode mode)
+{
+    switch (mode)
+    {
+    case RadioMode::setting:
+        return "Setting Mode";
+    case RadioMode::transmit:
+        return "Transmit Mode";
+    case RadioMode::unknown:
+        return "Unknown Mode";
+    default:
+        return "Invalid Mode";
+    }
+}
+
+void Radio::setup()
+{
+    radioSerial.begin(38400);
+    // sendSetup();
+    enterSettingMode(); // Entering settings
+}
+
+void Radio::loop() // What to loop
 {
     if (mode == RadioMode::unknown)
     {
-        sendCtrlC()
+        enterSettingMode(); // Entering settings
     }
-    radioSerial.println("set");
-    mode = RadioMode::transmit;
-}
-
-void Radio::loop()
-{
-    sendCtrlC();
     delay(100);
-    String readString = readFromRadio();
-    Serial.print(readString);
-    delay(5000);
-}
 
-String Radio::readFromRadio()
-{
-    if (radioSerial.available())
+    String readString = readFromRadio(); // Clearing the sending-memory, sending to PC
+    enterTransmitMode();
+    // Serial.println(readString);            //  Printing what is in the memory
+    Serial.println(getModeString(mode));
+
+    unsigned long currentMillis = millis();
+    if ((currentMillis - Radio::previousMillis) >= Radio::interval)
     {
-        String response = radioSerial.readString();
-        return response;
+        Radio::previousMillis = currentMillis;
+        Radio::readFromRadio();
     }
 
-    Serial.print("Uart not available");
-    return "";
+    delay(5000);
 }
 
 // 1. Koble til radio
@@ -57,5 +226,3 @@ String Radio::readFromRadio()
 
 // Ctrl-C: Sende/motta->Innstillinger
 // set : Innstillinger->Sende/motta
-
-                                                                                
