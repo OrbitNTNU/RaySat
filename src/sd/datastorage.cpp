@@ -45,11 +45,13 @@ void DataObject::newFile() {
 }
 
 // TODO: add timestamp system
-int DataObject::fileWrite(String txt) {
+int DataObject::fileWrite(String txt,String timestamp) {
     // Serial.println(path);
     String path = name+"/"+name+String(index)+".txt";
     File file = SD.open(path, FILE_WRITE);
     if (file) {
+        file.print(timestamp);
+        file.print(",");
         file.println(txt);
         _lineCount++;
         if (_lineCount >= 1000) {

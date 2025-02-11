@@ -32,8 +32,10 @@ void initSensors() {
     gyroData.init("gyrosc");
     ozoneData.init("ozones");
 }
-void readSensors(bool print=false) {
+void readSensors(bool print) {
     // --------------------- Read ----------------------
+    // time
+    String tid = timeStamp();
     // Pressure
     double pressure = read_pressure();
     // Temperature
@@ -51,11 +53,12 @@ void readSensors(bool print=false) {
     // Ozone
     int ozone = read_ozone();
     // --------------------- Write to SD ----------------------
-    ozoneData.fileWrite(String(ozone));
-    ultravioletData.fileWrite(String(uv));
-    pressureData.fileWrite(String(pressu));
-    temperatureInndoorsData.fileWrite(String(tempInn));
-    temperatureOutdoorsData.fileWrite(String(tempOut));
+    ozoneData.fileWrite(String(ozone),tid);
+    ultravioletData.fileWrite(String(uv),tid);
+    pressureData.fileWrite(String(pressu),tid);
+    temperatureInndoorsData.fileWrite(String(tempInn),tid);
+    temperatureOutdoorsData.fileWrite(String(tempOut),tid);
+    gyroData.fileWrite(String(x)+";"+String(y)+";"+String(z),tid);
     // --------------------- Print ----------------------
     if (print) {
         Serial.print("Ozone Data: "); Serial.println(ozone);

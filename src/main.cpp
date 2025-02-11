@@ -16,12 +16,12 @@ void setup() {
   sdSystemInit();
   // Serial.println("----------------------");
   initSensors();
+  Serial.println("Setup complete");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
-  readSensors(true);
+  readSensors(false);
   delay(1000);
 }
 

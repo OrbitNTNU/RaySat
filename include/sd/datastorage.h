@@ -37,12 +37,12 @@ void sdSystemInit();
 
 class DataObject {
     public:
-        String name;
-        int index;
         // int datatype;
-        int fileWrite(String txt);
+        int fileWrite(String txt,String timestamp);
         void init(String dataObjectName);
     private:
+        String name;
+        int index;
         void newFile();
         int _lineCount = 0;
 };
