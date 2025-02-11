@@ -25,5 +25,5 @@ int setup_ozone() {
 int read_ozone() {
     int16_t ozoneConcentration = Ozone.readOzoneData(COLLECT_NUMBER);
     Serial.print("Ozone consentration is: "); Serial.print(ozoneConcentration); Serial.println("");
-    return 0;
+    return ozoneConcentration;
 }

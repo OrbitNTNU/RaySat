@@ -39,9 +39,9 @@ class DataObject {
     public:
         String name;
         int index;
-        int datatype;
+        // int datatype;
         int fileWrite(String txt);
-        void init(String dataObjectName, int dataObjectType);
+        void init(String dataObjectName);
     private:
         void newFile();
         int _lineCount = 0;

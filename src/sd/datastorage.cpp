@@ -31,11 +31,11 @@ void sdSystemInit() {
     }
 }
 
-void DataObject::init(String dataObjectName, int dataObjectType) {
+void DataObject::init(String dataObjectName) {
     Serial.println("----------------------");
     Serial.println("Initialising data storage: " + dataObjectName);
     name = dataObjectName;
-    datatype = dataObjectType;
+    // datatype = dataObjectType;
     index=0;
     _lineCount = 0;
 }
@@ -57,7 +57,7 @@ int DataObject::fileWrite(String txt) {
         }
         file.close();
     } else {
-        Serial.println("error opening the file when trying to write");
+        Serial.print("error opening the file when trying to write "); Serial.print(txt); Serial.print(" to "); Serial.println(name);
         return 1;
     }
     return 0;

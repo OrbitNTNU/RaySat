@@ -40,10 +40,10 @@ void read_gyro(float& x, float& y, float& z, float& calibrated_x, float& calibra
     x = myIMU.readFloatGyroX() - gyro_x_call;
     y = myIMU.readFloatGyroY() - gyro_y_call;
     z = myIMU.readFloatGyroZ() - gyro_z_call;
-    Serial.print("Gyroscope: ");
-    Serial.print("X = "); Serial.print(x);
-    Serial.print("Y = "); Serial.print(y);
-    Serial.print("Z = "); Serial.println(z);
+    // Serial.print("Gyroscope: ");
+    // Serial.print("X = "); Serial.print(x);
+    // Serial.print("Y = "); Serial.print(y);
+    // Serial.print("Z = "); Serial.println(z);
     // static float gyroArray[] = {x, y, z};
     // return & gyroArray;
 }
