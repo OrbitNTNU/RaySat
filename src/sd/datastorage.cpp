@@ -31,11 +31,11 @@ void sdSystemInit() {
     }
 }
 
-void DataObject::init(String dataObjectName, int dataObjectType) {
+void DataObject::init(String dataObjectName) {
     Serial.println("----------------------");
     Serial.println("Initialising data storage: " + dataObjectName);
     name = dataObjectName;
-    datatype = dataObjectType;
+    // datatype = dataObjectType;
     index=0;
     _lineCount = 0;
 }
@@ -45,11 +45,13 @@ void DataObject::newFile() {
 }
 
 // TODO: add timestamp system
-int DataObject::fileWrite(String txt) {
+int DataObject::fileWrite(String txt,String timestamp) {
     // Serial.println(path);
     String path = name+"/"+name+String(index)+".txt";
     File file = SD.open(path, FILE_WRITE);
     if (file) {
+        file.print(timestamp);
+        file.print(",");
         file.println(txt);
         _lineCount++;
         if (_lineCount >= 1000) {
@@ -57,7 +59,7 @@ int DataObject::fileWrite(String txt) {
         }
         file.close();
     } else {
-        Serial.println("error opening the file when trying to write");
+        Serial.print("error opening the file when trying to write "); Serial.print(txt); Serial.print(" to "); Serial.println(name);
         return 1;
     }
     return 0;

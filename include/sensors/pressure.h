@@ -1,2 +1,2 @@
-void setup_pressure();
-double read_pressure();
+int setup_pressure();
+float read_pressure();

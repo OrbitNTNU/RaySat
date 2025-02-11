@@ -1,27 +1,28 @@
 #include <Arduino.h>
 #include <Wire.h>
 // local libraries
-#include "sensors/pressure.h"
 #include "sd/datastorage.h"
+#include "sensors/sensors.h"
+
+// #include "sensors/scanner.h"
 
 // put function declarations here:
 int myFunction(int, int);
-DataObject tester;
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  Serial.println("Initializing...");
+  // Serial.println("Initializing...");
   sdSystemInit();
-  Serial.println("----------------------");
-  tester.init("testma",2);
-  // tester.fileWrite("TESTER");
+  // Serial.println("----------------------");
+  initSensors();
+  Serial.println("Setup complete");
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // Serial.println(tester.name);
-  delay(10);
+  readSensors(false);
+  delay(1000);
 }
 
 // put function definitions here:
