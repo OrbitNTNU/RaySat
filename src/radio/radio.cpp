@@ -1,39 +1,49 @@
 #include "radio.h"
 
-std::vector<String> GNSS_Commands = {
-    "baud 9600",
-    "port1 nmea",
-    "p1-out none",
-    "p1-rfilter none",
-    "p1-pfilter none",
-    "verbose 3"};
+std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*= true*/)
+{
+    verbose = _verbose;
 
-std::vector<String> setupCommands = {
-    "access always",
-    "power high",
-    "mycall LA3JPA-11", // Må endres
-    "path",
-    "mice-cmt Orbit NTNU VHF test, \\vV \\tC HDOP\\h",
-    "mice-cmtint 3",
-    "mice-msg 7",
-    "mice-symbol /O",
-    "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ngham\\nport-rf-mute 0",
-    "autoexec-int 60", //+ aprsIntervalString,
-    "baud1 9600",
-    "port1 nmea",
-    "p1-out none",
-    "p1-rfilter none",
-    "p1-pfilter none",
-    "port0 ngham-spp" // bør endres
-};
+    std::vector<String> GNSS_Commands = {
+        "baud 9600",
+        "port1 nmea",
+        "p1-out none",
+        "p1-rfilter none",
+        "p1-pfilter none",
+        "verbose 3"};
 
-void Radio::write(const String& message){
-    Serial2.print(message);
+    std::vector<String> setupCommands = {
+        "access always",
+        "power high",
+        "mycall LA3JPA-11", // Må endres
+        "path",
+        "mice-cmt Orbit NTNU VHF test, \\vV \\tC HDOP\\h",
+        "mice-cmtint 3",
+        "mice-msg 7",
+        "mice-symbol /O",
+        "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ngham\\nport-rf-mute 0",
+        "autoexec-int 60", //+ aprsIntervalString,
+        "baud1 9600",
+        "port1 nmea",
+        "p1-out none",
+        "p1-rfilter none",
+        "p1-pfilter none",
+        "port0 ngham-spp" // bør endres
+    };
+    
+    radioSerial.begin(38400);
+    sendSetup();
+    enterSettingMode(); // Entering settings
+}
+
+void Radio::write(const String &message)
+{
+    radioSerial.println(message);
 }
 
 void Radio::sendCtrlC()
 {
-    radioSerial.print("\x03\n"); // Prints Ctrl + C to radio
+    write("\x03\n"); // Prints Ctrl + C to radio
 }
 
 void Radio::enterSettingMode() // Function to enter configuration mode
@@ -44,13 +54,9 @@ void Radio::enterSettingMode() // Function to enter configuration mode
         delay(600);
         mode = RadioMode::setting; // Sets mode to settings
     }
-    else
-    {
-        Serial.println("Already in setting mode");
-    }
 }
 
-void Radio::enterTransmitMode() // Function to enter transmit mode from settings mode (to recieve and send messages)
+std::pair<int, String> Radio::enterTransmitMode() // Function to enter transmit mode from settings mode (to recieve and send messages)
 {
     if (mode != RadioMode::transmit)
     {
@@ -58,19 +64,21 @@ void Radio::enterTransmitMode() // Function to enter transmit mode from settings
         {
             enterSettingMode();
         }
-        radioSerial.println("set"); // Prints "set" to radio to get back to transmit
+
+        auto results = sendSetupCommand("set"); // Prints "set" to radio to get back to transmit
+        // radioSerial.println("set"); 
         delay(300);
-        mode = RadioMode::transmit; // Sets mode to transmit
-        String response = readFromRadio();
-        if (response.indexOf(">") >= 0) // Sjekker om radioen returnerer en forventet respons
+        // String response = read();
+
+        if (results.second.indexOf(">") >= 0) // Checks if radio gave correct response
         {
             mode = RadioMode::transmit;
             Serial.println("Radio set to transmit mode");
+            return results;
         }
-        else
-        {
-            Serial.println("Error: Radio did not respond correctly");
-        }
+        
+        Serial.println("Error: Radio did not respond correctly");
+        return results;
     }
     else
     {
@@ -97,25 +105,21 @@ void Radio::setMode(RadioMode desiredMode)
 //     if (input == "setting")
 // }
 
-String Radio::readFromRadio() // Function for reading from radio
+String Radio::read() // Function for reading String from radio, and clears the sending memory
 {
     if (radioSerial.available()) // If the radio-port is available, read from it)
     {
         String response = radioSerial.readString();
-        if (response.indexOf("cmd_inv") >= 0)
-        {
-            Serial.println("cmd_inv: Radio is in the wrong mode or the commando is invalid.");
-            return "";
-        }
-
-        Serial.println("Radio answered: " + response);
         return response;
+        // if (response.indexOf("cmd_inv") >= 0)
+        // {
+        //     Serial.println("cmd_inv: Radio is in the wrong mode or the commando is invalid.");
+        //     return "";
+        // }
     }
-    else
-    {
-        Serial.println("Uart not available or no data to send"); // If not available, it is probably disconnected}
-        return "";
-    }
+
+    Serial.println("Uart not available or no data to send"); // If not available, it is probably disconnected}
+    return "";
 }
 
 void Radio::sendMessage(String message)
@@ -131,6 +135,61 @@ void Radio::sendMessage(String message)
 //     radioSerial.println("")
 // }
 
+void Radio::sendSetup()
+{
+    write("freq 145500000"); // sets the frequency on the radio TX/RX
+    write("mode ax25-1k2");  // sets the radio communication protocol
+    write("access csma");    // sets access method, here carrier sense multiple access
+    write("port0 text");     // sets port0 to be used for text TX/RX
+}
+
+std::pair<int, String> Radio::sendSetupCommand(String command)
+{
+
+    if (mode != RadioMode::setting)
+    {
+        return std::make_pair(-1, "Not in settings mode \n");
+    }
+
+    write(command);
+
+    String response = read();
+
+    if (verbose)
+    {
+        Serial.print("Sending command: (");
+        Serial.print(command);
+        Serial.print(") got response: ");
+        Serial.println(response);
+    }
+
+    return std::make_pair(0, response);
+
+    // Trenger noen errorgreier
+}
+
+std::pair<int, String> Radio::sendConfiguration(std::vector<String> commandsToSend)
+{
+    enterSettingMode();
+    std::pair<int, String> results;
+
+    for (int i = 0; i < commandsToSend.size(); i++)
+    {
+        results = sendSetupCommand(commandsToSend.at(i));
+        if (results.first < 0) {
+            return results;
+        }
+    }
+
+    results = enterTransmitMode();
+    if(results.first < 0){
+        return results;
+    }
+
+    return std::make_pair(0, "");
+
+
+}
 /*
 void Radio::menu() {
         while (1) {
@@ -181,13 +240,6 @@ String Radio::getModeString(RadioMode mode)
     }
 }
 
-void Radio::setup()
-{
-    radioSerial.begin(38400);
-    // sendSetup();
-    enterSettingMode(); // Entering settings
-}
-
 void Radio::loop() // What to loop
 {
     if (mode == RadioMode::unknown)
@@ -196,7 +248,7 @@ void Radio::loop() // What to loop
     }
     delay(100);
 
-    String readString = readFromRadio(); // Clearing the sending-memory, sending to PC
+    String readString = read(); // Clearing the sending-memory, sending to PC
     enterTransmitMode();
     // Serial.println(readString);            //  Printing what is in the memory
     Serial.println(getModeString(mode));
@@ -205,7 +257,7 @@ void Radio::loop() // What to loop
     if ((currentMillis - Radio::previousMillis) >= Radio::interval)
     {
         Radio::previousMillis = currentMillis;
-        Radio::readFromRadio();
+        Radio::read();
     }
 
     delay(5000);
