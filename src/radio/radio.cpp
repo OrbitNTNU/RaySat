@@ -15,25 +15,29 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
     std::vector<String> setupCommands = {
         "access always",
         "power high",
-        "mycall LA3JPA-11", // Må endres
+        "mycall LA9ORB-11",
         "path",
+        "freq 145500000", // sets the frequency on the radio TX/RX
         "mice-cmt Orbit NTNU VHF test, \\vV \\tC HDOP\\h",
         "mice-cmtint 3",
         "mice-msg 7",
         "mice-symbol /O",
         "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ngham\\nport-rf-mute 0",
-        "autoexec-int 60", //+ aprsIntervalString,
+        "autoexec-int " + String(aprsInterval),
         "baud1 9600",
         "port1 nmea",
         "p1-out none",
         "p1-rfilter none",
         "p1-pfilter none",
-        "port0 ngham-spp" // bør endres
+        "port0 text",
+        "mode ax25-1k2",  // sets the radio communication protocol
     };
     
     radioSerial.begin(38400);
     sendSetup();
     enterSettingMode(); // Entering settings
+
+    // Itererer gjennom alt
 }
 
 void Radio::write(const String &message)

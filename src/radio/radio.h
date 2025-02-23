@@ -1,5 +1,6 @@
 #include <SoftwareSerial.h>
 #include <vector>
+#include <string>
 #pragma once
 
 enum class RadioMode
