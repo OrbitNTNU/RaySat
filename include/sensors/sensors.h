@@ -7,5 +7,19 @@
 #include "sd/datastorage.h"
 #include "sensors/clock.h"
 
+struct SensorData {
+    String timestamp_ms;
+    int ozone_ppm;
+    uint32_t uv;
+    double pressure;
+    float insideTemperature;
+    float outsideTemperature;
+    float gyro_x;
+    float gyro_y;
+    float gyro_z;
+    SensorData();
+};
 void initSensors();
-void readSensors(bool print);
+void readSensors(SensorData& data);
+void writeSensorData(const SensorData& data);
+void printSensorData(const SensorData& data);
