@@ -36,7 +36,10 @@ void setup()
 void loop()
 {
   // put your main code here, to run repeatedly:
-  // readSensors(false);
+  SensorData data;
+  readSensors(data);
+  writeSensorData(data);
+  printSensorData(data);
   delay(1000);
 
   Serial.println("Hei hei");
