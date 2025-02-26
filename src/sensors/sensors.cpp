@@ -14,6 +14,18 @@ float gyro_calibrated_x;
 float gyro_calibrated_y;
 float gyro_calibrated_z;
 
+SensorData::SensorData() {
+    timestamp_ms = "0";
+    ozone_ppm = 0;
+    uv = 0;
+    pressure = 0.0;
+    insideTemperature = 0.0;
+    outsideTemperature = 0.0;
+    gyro_x = 0.0;
+    gyro_y = 0.0;
+    gyro_z = 0.0;
+}
+
 void initSensors() {
     // Setup sensors
     Serial.println("Setting up sensors");
@@ -32,44 +44,46 @@ void initSensors() {
     gyroData.init("gyrosc");
     ozoneData.init("ozones");
 }
-void readSensors(bool print) {
+
+void readSensors(SensorData& data) {
     // --------------------- Read ----------------------
     // time
-    String tid = timeStamp();
+    data.timestamp_ms = timeStamp();
     // Pressure
-    double pressure = read_pressure();
+    data.pressure = read_pressure();
     // Temperature
-    float tempOut = tempOutdoors.read();
-    float tempInn = tempIndoors.read();
+    data.insideTemperature = tempIndoors.read();
+    data.outsideTemperature= tempOutdoors.read();
     // Pressure
-    float pressu = read_pressure(); 
+    data.pressure = read_pressure();
     // UV
-    uint32_t uv = read_uv();
+    data.uv = read_uv();
     // Gyro
-    float x;
-    float y;
-    float z;
-    read_gyro(x,y,z,gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);  
+    read_gyro(data.gyro_x,data.gyro_y,data.gyro_z,
+              gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);
     // Ozone
-    int ozone = read_ozone();
+    data.ozone_ppm = read_ozone();
+}
+
+void writeSensorData(const SensorData& data) {
     // --------------------- Write to SD ----------------------
-    ozoneData.fileWrite(String(ozone),tid);
-    ultravioletData.fileWrite(String(uv),tid);
-    pressureData.fileWrite(String(pressu),tid);
-    temperatureInndoorsData.fileWrite(String(tempInn),tid);
-    temperatureOutdoorsData.fileWrite(String(tempOut),tid);
-    gyroData.fileWrite(String(x)+";"+String(y)+";"+String(z),tid);
-    // --------------------- Radio ----------------------
-    
+    ozoneData.fileWrite(String(data.ozone_ppm),data.timestamp_ms);
+    ultravioletData.fileWrite(String(data.uv),data.timestamp_ms);
+    pressureData.fileWrite(String(data.pressure),data.timestamp_ms);
+    temperatureInndoorsData.fileWrite(String(data.insideTemperature),data.timestamp_ms);
+    temperatureOutdoorsData.fileWrite(String(data.outsideTemperature),data.timestamp_ms);
+    gyroData.fileWrite(String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z),data.timestamp_ms);
+
+}
+
+void printSensorData(const SensorData& data) {
     // --------------------- Print ----------------------
-    if (print) {
-        Serial.print("Ozone Data: "); Serial.println(ozone);
-        Serial.print("UV Data: "); Serial.println(uv);
-        Serial.print("Pressure Data: "); Serial.println(pressu);
-        Serial.print("Outdoors temperature Data: "); Serial.println(tempOut);
-        Serial.print("Inndoors temperature Data: "); Serial.println(tempInn);
-        Serial.print("Gyro X: "); Serial.print(x); 
-        Serial.print(" Gyro Y: "); Serial.print(y);
-        Serial.print(" Gyro Z: "); Serial.print(z);
-    }
+    Serial.print("Ozone Data: "); Serial.println(data.ozone_ppm);
+    Serial.print("UV Data: "); Serial.println(data.uv);
+    Serial.print("Pressure Data: "); Serial.println(data.pressure);
+    Serial.print("Outdoors temperature Data: "); Serial.println(data.outsideTemperature);
+    Serial.print("Inndoors temperature Data: "); Serial.println(data.insideTemperature);
+    Serial.print("Gyro X: "); Serial.print(data.gyro_x); 
+    Serial.print(" Gyro Y: "); Serial.print(data.gyro_y);
+    Serial.print(" Gyro Z: "); Serial.println(data.gyro_z);
 }
