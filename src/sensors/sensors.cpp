@@ -59,6 +59,8 @@ void readSensors(bool print) {
     temperatureInndoorsData.fileWrite(String(tempInn),tid);
     temperatureOutdoorsData.fileWrite(String(tempOut),tid);
     gyroData.fileWrite(String(x)+";"+String(y)+";"+String(z),tid);
+    // --------------------- Radio ----------------------
+    
     // --------------------- Print ----------------------
     if (print) {
         Serial.print("Ozone Data: "); Serial.println(ozone);
