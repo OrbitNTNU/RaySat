@@ -3,8 +3,10 @@
 // local libraries
 #include "sd/datastorage.h"
 #include "sensors/sensors.h"
+#include "reactionWheel/rwController.h"
 
 // #include "sensors/scanner.h"
+RWController rwController;
 
 // put function declarations here:
 int myFunction(int, int);
@@ -24,6 +26,7 @@ void loop() {
   SensorData data;
   readSensors(data);
   writeSensorData(data);
+  rwController.control(data);
   printSensorData(data);
   delay(1000);
 }
