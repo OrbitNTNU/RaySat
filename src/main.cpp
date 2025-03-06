@@ -4,65 +4,65 @@
 #include "sd/datastorage.h"
 #include "sensors/sensors.h"
 #include "radio/radio.h"
-#include "radio/radioError.h"
 // #include "sensors/scanner.h"
 
 Radio radio;
+SensorData data;
 
+// ------------------- Clock Variables -------------------
 unsigned long startTime = millis();
-unsigned long previousMillis = millis();
+unsigned long previousMillis = startTime;
+const long interval = 5000;
 
 void setup()
 {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  // Serial.println("Initializing...");
+  Serial.println("Initializing...");
   // sdSystemInit();
-  // Serial.println("----------------------");
+  Serial.println("----------------------");
   // initSensors();
 
-
-  try
-  {
-    radio.setup();
-  } catch (RadioError err) {
-    // Prints error message
-    Serial.println("Error was caused by radio: ");
-    Serial.println(err.what());
+  // ------------------- Radio Setup -------------------
+  for (int i = 0; i<10; i++) {
+    auto radioSetup = radio.setup();
+    if (radioSetup.first == -1) {
+      Serial.println("Error was caused by radio setup: ");
+      Serial.println(radioSetup.second);
+      Serial.println("Trying again... [" + String(i+1) + "/10]");
+    }
+    else if (radioSetup.first == 0) {
+      Serial.println("Radio configuration successful");
+      break;
+    }
   }
-  Serial.println("Setup complete");
-}
 
+  Serial.println(radio.readFromRadio());
+  Serial.println("Setup complete");
+
+}
+int i = 0;
 void loop()
 {
-  // put your main code here, to run repeatedly:
-  SensorData data;
-  readSensors(data);
-  writeSensorData(data);
-  printSensorData(data);
-  delay(1000);
+//   readSensors(data);
+//   // writeSensorData(data);
+//   printSensorData(data);
 
-  Serial.println("Hei hei");
+  if (radio.mode == RadioMode::unknown)
+  {
+      radio.enterSettingMode();
+  }
+  radio.enterTransmitMode();
 
   unsigned long currentMillis = millis();
-  unsigned long interval = 5;
-  // if ((currentMillis - previousMillis) >= interval)
-  // {
-  //   previousMillis = currentMillis;
-  //   radio.read();
-  // }
-
-  try {
-    radio.loop();
-  } catch(RadioError err) {
-    Serial.println("Error was caused by radio: ");
-    Serial.println(err.what());
+  if ((currentMillis - previousMillis) >= interval)
+  {
+      previousMillis = currentMillis;
+      radio.transmit("1052;1000;27;28;100;50;420;42;50");
   }
-}
 
-// unsigned long currentMillis = millis();
-// if ((currentMillis - Radio::previousMillis) >= Radio::interval)
-// {
-//     Radio::previousMillis = currentMillis;
-//     Radio::read();
-// }
+  Serial.println(radio.readFromRadio());
+  Serial.println(i);
+  i++;
+  delay(5000);
+}

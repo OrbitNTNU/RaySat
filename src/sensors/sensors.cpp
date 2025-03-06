@@ -54,8 +54,6 @@ void readSensors(SensorData& data) {
     // Temperature
     data.insideTemperature = tempIndoors.read();
     data.outsideTemperature= tempOutdoors.read();
-    // Pressure
-    data.pressure = read_pressure();
     // UV
     data.uv = read_uv();
     // Gyro
@@ -75,6 +73,15 @@ void writeSensorData(const SensorData& data) {
     gyroData.fileWrite(String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z),data.timestamp_ms);
 
 }
+
+String transmitSensorData(const SensorData& data) {
+    // --------------------- Send via radio ----------------------
+    String transmitLine = data.timestamp_ms+";"+String(data.pressure)+";"+String(data.insideTemperature)+";"+String(data.outsideTemperature)+";"+String(data.uv)+";"+String(data.ozone_ppm)+";"+String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z);
+    // String transmitLine = String(data.outsideTemperature)+"\r\n";
+    return transmitLine;
+}
+
+
 
 void printSensorData(const SensorData& data) {
     // --------------------- Print ----------------------

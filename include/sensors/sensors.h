@@ -22,4 +22,5 @@ struct SensorData {
 void initSensors();
 void readSensors(SensorData& data);
 void writeSensorData(const SensorData& data);
+String transmitSensorData(const SensorData& data);
 void printSensorData(const SensorData& data);

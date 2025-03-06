@@ -3,38 +3,36 @@
 #include <string>
 #pragma once
 
-enum class RadioMode
-{
+#define BAUD_RATE 38400
+
+enum class RadioMode {
+    // Modes that the radio can be in
     unknown,
     setting,
     transmit
-}; // Modes that the radio can be in
+};
 
 class Radio
 {
-
-
 public:
-    void setup(int aprsInterval = 20, bool _verbose = true);
-    void loop();
+    RadioMode mode = RadioMode::unknown;
+
+    std::pair<int, String> setup(int aprsInterval = 20, bool _verbose = true);
+    std::pair<int, String> enterTransmitMode();
+    void enterSettingMode();
+    std::pair<int, String> transmit(String message);
 
     String readFromRadio(); // Reading from radio
-    void transmit(String message);
-
 private:
-    HardwareSerial radioSerial{PC5, PC4}; // Uart pins to radio (D1=TX/D0=RX on CN9)
-    RadioMode mode = RadioMode::unknown;  // Initial mode is unknown
-    unsigned long previousMillis = 0;
-    const long interval = 10000;
-    void enterSettingMode();
-    void enterTransmitMode();
-    String getModeString(RadioMode mode);
+    bool verbose;
+    // HardwareSerial radioSerial{PC5, PC4}; // Uart pins to radio (D1=TX/D0=RX on CN9)
+    HardwareSerial radioSerial{D0, D1};
 
-    String sendSetupCommand(String command);
-    void sendConfiguration(std::vector<String> commandsToSend);
+    std::pair<int, String> sendSetupCommand(String command);
+    std::pair<int, String> sendConfiguration(std::vector<String> commandsToSend);
+
+    String getModeString(RadioMode mode);
     void sendCtrlC();
 
     void write(const String &message);
-
-    bool verbose;
 };
