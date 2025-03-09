@@ -24,7 +24,7 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
             "power hi",
             "mycall LA9ORB-11",
             "path  ",
-            "freq 145500000", // sets the frequency on the radio TX/RX
+            "freq 144700000", // sets the frequency on the radio TX/RX
             "mice-cmt Orbit NTNU VHF test, \\vV \\tC HDOP\\h",
             "mice-cmtint 3",
             "mice-msg 7",
