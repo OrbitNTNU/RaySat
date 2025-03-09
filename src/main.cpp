@@ -6,6 +6,7 @@
 #include "radio/radio.h"
 // #include "sensors/scanner.h"
 
+// ------------------- Class Initilizations -------------------  
 Radio radio;
 SensorData data;
 
@@ -16,7 +17,6 @@ const long interval = 5000;
 
 void setup()
 {
-  // put your setup code here, to run once:
   Serial.begin(9600);
   Serial.println("Initializing...");
   // sdSystemInit();
@@ -24,6 +24,7 @@ void setup()
   // initSensors();
 
   // ------------------- Radio Setup -------------------
+  Serial.println(radio.setup().second);
   for (int i = 0; i<10; i++) {
     auto radioSetup = radio.setup();
     if (radioSetup.first == -1) {
@@ -41,6 +42,8 @@ void setup()
   Serial.println("Setup complete");
 
 }
+
+
 int i = 0;
 void loop()
 {
@@ -58,7 +61,7 @@ void loop()
   if ((currentMillis - previousMillis) >= interval)
   {
       previousMillis = currentMillis;
-      radio.transmit("1052;1000;27;28;100;50;420;42;50");
+      radio.transmit(String(i)+";1000;27;28;100;50;420;42;50");
   }
 
   Serial.println(radio.readFromRadio());

@@ -1,19 +1,22 @@
 #include "radio.h"
-#include "radioError.h"
 
 std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*= true*/)
 {
         verbose = _verbose;
 
-        /*
-        std::vector<String> GNSS_Commands = {
-            "baud 9600",
+        
+        std::vector<String> GNSSCommands = {
+            "baud1 9600",
             "port1 nmea",
             "p1-out none",
             "p1-rfilter none",
             "p1-pfilter none",
             "verbose 3"};
-        */
+        
+        // auto results = sendConfiguration(GNSSCommands);
+        // if (results.first < 0) {
+        //     return results;
+        // }
 
         std::vector<String> setupCommands = {
             "access always",
@@ -26,16 +29,16 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
             "mice-cmtint 3",
             "mice-msg 7",
             "mice-symbol /O",
-            // "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq  145500000\\nmode ax25-1k2\\nport-rf-mute 0",
-            // "autoexec-int " + String(aprsInterval),
+            "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq  145500000\\nmode ax25-1k2\\nport-rf-mute 0",
+            "autoexec-int " + String(aprsInterval),
             "baud1 9600",
             "port1 nmea",
             "p1-out all",
             "p1-rfilter none",
             "p1-pfilter none",
-            "port0 text",
+            "port0 text",  // This prevents airborn mode to be printed
             "verbose 3",
-            // "cfg-save",
+            "cfg-save",
         };
     
     radioSerial.begin(BAUD_RATE);
@@ -116,7 +119,7 @@ String Radio::readFromRadio()
     return "";
 }
 
-std::pair<int, String> Radio::sendSetupCommand(String command)
+std::pair<int, String> Radio::sendSetupCommand(const String& command)
 {
 
     if (mode != RadioMode::setting)

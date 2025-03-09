@@ -28,7 +28,7 @@ private:
     // HardwareSerial radioSerial{PC5, PC4}; // Uart pins to radio (D1=TX/D0=RX on CN9)
     HardwareSerial radioSerial{D0, D1};
 
-    std::pair<int, String> sendSetupCommand(String command);
+    std::pair<int, String> sendSetupCommand(const String& command);
     std::pair<int, String> sendConfiguration(std::vector<String> commandsToSend);
 
     String getModeString(RadioMode mode);
