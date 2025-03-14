@@ -26,8 +26,8 @@ void loop() {
   SensorData data;
   readSensors(data);
   writeSensorData(data);
-  rwController.control(data);
-  printSensorData(data);
+  // rwController.control(data);
+  // printSensorData(data);
   delay(1000);
 }
 
