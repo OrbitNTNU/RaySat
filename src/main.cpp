@@ -10,6 +10,7 @@
 Radio radio;
 SensorData data;
 bool flightMode = false;
+String callSign = "LA9ORB";
 
 /* --- hvit -> RX, svart -> TX på OBC --- */
 
@@ -41,9 +42,6 @@ void setup()
       break;
     }
   }
-
-
-
   Serial.println(radio.readFromRadio());
   radio.checkGnssFix();
   // while (true) {
@@ -55,7 +53,6 @@ void setup()
 
   // }
   Serial.println("Setup complete");
-
 
   flightMode = true;
   unsigned long startTime = millis();
@@ -69,19 +66,13 @@ void loop()
 
   readSensors(data);
   // writeSensorData(data);
-//   printSensorData(data);
-
-  // if (radio.mode == RadioMode::unknown)
-  // {
-  //     radio.enterSettingMode();
-  // }
 
   unsigned long currentMillis = millis();
   if ((currentMillis - previousMillis) >= interval)
   {
     String dataString = transmitSensorData(data);
-    auto transmitResult = radio.transmit(dataString);
-    Serial.println(String(i) + dataString);
+    auto transmitResult = radio.transmit(callSign + ";" + dataString);
+    Serial.println(callSign + dataString);
     previousMillis = currentMillis;
     // auto transmitResult = radio.transmit(String(i) + ";1000;0;0;0;50;420;42;50");
     // auto transmitResult = radio.transmit(String(i) + "Hei Knut :-) Hilsen fra Orbit NTNU!");

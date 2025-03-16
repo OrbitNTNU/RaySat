@@ -34,7 +34,7 @@ void initSensors() {
     setup_pressure();
     setup_uv();
     calibrate_gyro(2000, gyro_calibrated_x, gyro_calibrated_y, gyro_calibrated_z);
-    setup_ozone();
+    // setup_ozone();
     // setup sd card
     Serial.println("Setting up SD storage for sensors");
     temperatureOutdoorsData.init("tmpout");
@@ -42,7 +42,7 @@ void initSensors() {
     pressureData.init("pressu");
     ultravioletData.init("violet");
     gyroData.init("gyrosc");
-    ozoneData.init("ozones");
+    // ozoneData.init("ozones");
 }
 
 void readSensors(SensorData& data) {
@@ -60,7 +60,8 @@ void readSensors(SensorData& data) {
     read_gyro(data.gyro_x,data.gyro_y,data.gyro_z,
               gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);
     // Ozone
-    data.ozone_ppm = read_ozone();
+    // data.ozone_ppm = read_ozone();
+    data.ozone_ppm = 30;
 }
 
 void writeSensorData(const SensorData& data) {
