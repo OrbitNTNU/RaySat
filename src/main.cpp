@@ -4,6 +4,7 @@
 #include "sd/datastorage.h"
 #include "sensors/sensors.h"
 #include "reactionWheel/rwController.h"
+#include "bms/bms.h"
 
 // #include "sensors/scanner.h"
 RWController rwController;
@@ -14,7 +15,8 @@ int myFunction(int, int);
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  // Serial.println("Initializing...");
+  Serial.println("Initializing...");
+  bmsInit();
   sdSystemInit();
   // Serial.println("----------------------");
   initSensors();
