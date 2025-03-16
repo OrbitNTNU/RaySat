@@ -76,9 +76,9 @@ void writeSensorData(const SensorData& data) {
 
 String transmitSensorData(const SensorData& data) {
     // --------------------- Send via radio ----------------------
-    String transmitLine = data.timestamp_ms+";"+String(data.pressure)+";"+String(data.insideTemperature)+";"+String(data.outsideTemperature)+";"+String(data.uv)+";"+String(data.ozone_ppm)+";"+String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z);
+    String transmitString = data.timestamp_ms+";"+String(data.pressure)+";"+String(data.insideTemperature)+";"+String(data.outsideTemperature)+";"+String(data.uv)+";"+String(data.ozone_ppm)+";"+String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z);
     // String transmitLine = String(data.outsideTemperature)+"\r\n";
-    return transmitLine;
+    return transmitString;
 }
 
 

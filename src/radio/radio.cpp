@@ -5,45 +5,37 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
         verbose = _verbose;
 
         
-        std::vector<String> GNSSCommands = {
+        // std::vector<String> GNSSCommands = {
+        //     "baud1 9600",
+        //     "port1 nmea",
+        //     "p1-out none",
+        //     "p1-rfilter none",
+        //     "p1-pfilter none",
+        //     "verbose 3"};
+
+        std::vector<String> setupCommands = {
+            "access always",
+            "mode ax25-1k2",  // sets the radio communication protocol
+            "power mid",    // CHANGE TO HI!!!!!!
+            "mycall LA9ORB-11",
+            "path  ",
+            "freq 144700000", // sets the frequency on the radio TX/RX
+            "mice-cmt SO Test, \\vV \\tC HDOP\\h",
+            "mice-cmtint 3",
+            "mice-msg 7",
+            "mice-symbol /O",
+            "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ax25-1k2\\nport-rf-mute 0",
+            "autoexec-int " + String(aprsInterval),
             "baud1 9600",
             "port1 nmea",
             "p1-out none",
             "p1-rfilter none",
             "p1-pfilter none",
-            "verbose 3"};
-        
-        // auto results = sendConfiguration(GNSSCommands);
-        // if (results.first < 0) {
-        //     return results;
-        // }
-
-        std::vector<String> setupCommands = {
-            "access always",
-            "mode ax25-1k2",  // sets the radio communication protocol
-            "power hi",
-            "mycall LA9ORB-11",
-            "path  ",
-            "freq 144700000", // sets the frequency on the radio TX/RX
-            "mice-cmt Orbit NTNU VHF test, \\vV \\tC HDOP\\h",
-            "mice-cmtint 3",
-            "mice-msg 7",
-            "mice-symbol /O",
-            "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq  145500000\\nmode ax25-1k2\\nport-rf-mute 0",
-            "autoexec-int " + String(aprsInterval),
-            "baud1 9600",
-            "port1 nmea",
-            "p1-out all",
-            "p1-rfilter none",
-            "p1-pfilter none",
             "port0 text",  // This prevents airborn mode to be printed
-            "verbose 3",
-            "cfg-save",
+            "verbose 3"
         };
     
     radioSerial.begin(BAUD_RATE);
-
-    enterSettingMode();
 
     return sendConfiguration(setupCommands);
 }
@@ -59,7 +51,37 @@ std::pair<int, String> Radio::transmit(String message)
     if (result.first == -1) {return result;}
 
     write(message);
+
     return std::make_pair(0, "");
+}
+
+std::pair<int, String> Radio::checkGnssFix() {
+    auto result = sendSetupCommand("info");
+    Serial.println(result.second);
+    if (result.first < 0) {return result;}
+
+    String fixString = result.second;
+    fixString.replace(" ", ""); 
+
+    int fixIndex = fixString.indexOf("g_fix");
+    if (fixIndex != -1) {
+        String fixValue = fixString.substring(fixIndex+5);
+        Serial.println("Processed String: " + fixString);
+        Serial.println("Extracted Fix Value: " + fixValue);
+
+        if (fixValue.toInt() > 0) {
+            Serial.println("GNSS fix acquired");
+            gnssFix = true;
+            return std::make_pair(0, "");
+        }
+        else {
+            Serial.println("No GNSS fix");
+            return std::make_pair(1, "No GNSS fix");
+        }
+    } else {
+        Serial.println("g_fix not found.");
+        return std::make_pair(-2, "g_fix not found");
+    }
 }
 
 void Radio::sendCtrlC()
@@ -130,9 +152,8 @@ std::pair<int, String> Radio::sendSetupCommand(const String& command)
     write(command);
 
     delay(50);
-
-    String response = readFromRadio();
-
+    auto response = readFromRadio();
+    
     if (verbose)
     {
         Serial.print("Sending command: (");
@@ -145,6 +166,10 @@ std::pair<int, String> Radio::sendSetupCommand(const String& command)
     if ((std::string(command.c_str()).compare(0, 9, "mice-cmt ") == 0) || 
     (std::string(command.c_str()).compare(0, 13, "autoexec-cmd ") == 0)) {
         return (std::make_pair(0, response));
+    }
+
+    if (std::string(command.c_str()).compare(0, 5, "info ") == 0) {
+        return std::make_pair(0, response);
     }
 
     if (std::string(response.c_str()).find(std::string(command.c_str()) + " ok") == std::string::npos){
@@ -163,10 +188,6 @@ std::pair<int, String> Radio::sendConfiguration(std::vector<String> commandsToSe
         if (result.first == -1) {
             return result;
         }
-    }
-    auto result = enterTransmitMode();
-    if (result.first == -1) {
-        return result;
     }
     return std::make_pair(0, "");
 }
