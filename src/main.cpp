@@ -4,11 +4,15 @@
 #include "sd/datastorage.h"
 #include "sensors/sensors.h"
 #include "radio/radio.h"
+#include "reactionWheel/rwController.h"
+
 // #include "sensors/scanner.h"
+
 
 // ------------------- Class Initilizations -------------------  
 Radio radio;
 SensorData data;
+RWController rwController;
 bool flightMode = false;
 String callSign = "LA9ORB";
 
@@ -65,7 +69,9 @@ void loop()
 {
 
   readSensors(data);
-  // writeSensorData(data);
+  writeSensorData(data);
+  rwController.control(data);
+  printSensorData(data);
 
   unsigned long currentMillis = millis();
   if ((currentMillis - previousMillis) >= interval)
@@ -81,7 +87,8 @@ void loop()
     if (transmitResult.first == -1) {
       Serial.println("Transmission failed: " + transmitResult.second);
     }
-}
+  }
+  
 
   Serial.println(radio.readFromRadio());
   if (Serial.available()>0) {

@@ -17,6 +17,7 @@ struct SensorData {
     float gyro_x;
     float gyro_y;
     float gyro_z;
+    float height;
     SensorData();
 };
 void initSensors();

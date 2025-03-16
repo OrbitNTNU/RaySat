@@ -1,4 +1,5 @@
 #include "sensors/sensors.h"
+#include "sensors/height.h"
 
 DataObject temperatureOutdoorsData;
 DataObject temperatureInndoorsData;
@@ -14,6 +15,8 @@ float gyro_calibrated_x;
 float gyro_calibrated_y;
 float gyro_calibrated_z;
 
+Height heightCalculator;
+
 SensorData::SensorData() {
     timestamp_ms = "0";
     ozone_ppm = 0;
@@ -24,6 +27,7 @@ SensorData::SensorData() {
     gyro_x = 0.0;
     gyro_y = 0.0;
     gyro_z = 0.0;
+    height = 0.0;
 }
 
 void initSensors() {
@@ -42,7 +46,10 @@ void initSensors() {
     pressureData.init("pressu");
     ultravioletData.init("violet");
     gyroData.init("gyrosc");
-    // ozoneData.init("ozones");
+    ozoneData.init("ozones");
+    float T0 = tempOutdoors.read();
+    double P0 = read_pressure();
+    heightCalculator.setupHeight(T0,P0);
 }
 
 void readSensors(SensorData& data) {
@@ -60,8 +67,9 @@ void readSensors(SensorData& data) {
     read_gyro(data.gyro_x,data.gyro_y,data.gyro_z,
               gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);
     // Ozone
-    // data.ozone_ppm = read_ozone();
-    data.ozone_ppm = 30;
+    data.ozone_ppm = read_ozone();
+    // Height
+    heightCalculator.calculateHeight(data);
 }
 
 void writeSensorData(const SensorData& data) {
@@ -94,4 +102,5 @@ void printSensorData(const SensorData& data) {
     Serial.print("Gyro X: "); Serial.print(data.gyro_x); 
     Serial.print(" Gyro Y: "); Serial.print(data.gyro_y);
     Serial.print(" Gyro Z: "); Serial.println(data.gyro_z);
+    Serial.print("Height: "); Serial.println(data.height);
 }
