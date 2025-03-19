@@ -229,23 +229,6 @@ String Radio::getModeString(const RadioMode& mode)
     }
 }
 
-
-// void initRadio(Radio& radio) {
-//     for (int i = 0; i<10; i++) {
-//     auto radioSetup = radio.setup();
-//     if (radioSetup.first == -1) {
-//       Serial.println("Error was caused by radio setup: ");
-//       Serial.println(radioSetup.second);
-//       Serial.println("Trying again... [" + String(i+1) + "/10]");
-//     }
-//     else if (radioSetup.first == 0) {
-//       Serial.println("Radio configuration successful");
-//       break;
-//     }
-//   }
-// }
-
-
 void Radio::checkIncomingRW(const std::string& messageStr, RWController& rwController) {
   if (messageStr.find("manual") != std::string::npos) {
     rwController.toggleManual();
