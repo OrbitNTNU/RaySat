@@ -106,7 +106,5 @@ void loop()
 
   Serial.println(radio.readFromRadio());
 
-  Serial.println(i);
-  i++;
   delay(5000);
 }
