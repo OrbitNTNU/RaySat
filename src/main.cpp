@@ -12,8 +12,6 @@ Radio radio;
 SensorData data;
 RWController rwController;
 const String callSign = "LA9ORB";
-bool flightMode = false;
-bool rwOff = false;
 
 /* --- hvit -> RX, svart -> TX på OBC --- */
 
@@ -33,20 +31,8 @@ void setup()
 
   // ------------------- Radio Setup -------------------
   radio.mode = RadioMode::unknown;
-
-
-  for (int i = 0; i<10; i++) {
-    auto radioSetup = radio.setup();
-    if (radioSetup.first == -1) {
-      Serial.println("Error was caused by radio setup: ");
-      Serial.println(radioSetup.second);
-      Serial.println("Trying again... [" + String(i+1) + "/10]");
-    }
-    else if (radioSetup.first == 0) {
-      Serial.println("Radio configuration successful");
-      break;
-    }
-  }
+  // initRadio(radio);
+  
 
 
   Serial.println(radio.readFromRadio());
@@ -70,12 +56,10 @@ void setup()
 
   Serial.println("Setup complete");
 
-  flightMode = true;
   unsigned long startTime = millis();
 }
 
 
-int i = 0;
 // ------------------- Loop -------------------
 void loop()
 {
@@ -107,7 +91,6 @@ void loop()
 
   Serial.println(radio.readFromRadio());
 
-  Serial.println(i);
-  i++;
-  delay(5000);
+
+  delay(1000);
 }

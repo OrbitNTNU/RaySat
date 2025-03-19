@@ -19,7 +19,7 @@ class Radio
 {
 public:
     RadioMode mode = RadioMode::unknown;
-    
+
     std::pair<int, String> setup(int aprsInterval = 20, bool _verbose = true);
     std::pair<int, String> enterTransmitMode();
     void enterSettingMode();
@@ -28,6 +28,9 @@ public:
     void checkIncomingRW(const std::string& messageStr, RWController& rwController);
 
     String readFromRadio(); // Reading from radio
+
+    // void initRadio();
+
 private:
     bool verbose;
     bool gnssFix = false;
@@ -40,4 +43,5 @@ private:
 
     void sendCtrlC();
     void write(const String& message);
+
 };
