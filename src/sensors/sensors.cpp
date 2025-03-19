@@ -33,15 +33,22 @@ SensorData::SensorData() {
     edvinTime = 0;
 }
 //D8
-void initSensors() {
+void initSensors(bool debugMode) {
     // Setup sensors
     Serial.println("Setting up sensors");
-    tempOutdoors.init(0x48);
-    tempIndoors.init(0x49);
-    setup_pressure();
-    setup_uv();
+    Serial.println("-----------TEMP OUTDOORS-----------");
+    tempOutdoors.init(0x48,debugMode);
+    Serial.println("-----------TEMP INDOORS-----------");
+    tempIndoors.init(0x49,debugMode);
+    Serial.println("-----------PRESSURE-----------");
+    setup_pressure(debugMode);
+    Serial.println("-----------UV-----------");
+    setup_uv(debugMode);
+    Serial.println("-----------GYRO-----------");
     calibrate_gyro(2000, gyro_calibrated_x, gyro_calibrated_y, gyro_calibrated_z);
+    Serial.println("-----------OZONE-----------");
     setup_ozone();
+    Serial.println("-----------EDVINCLOCK-----------");
     edvinclock.init(D8);
     // // setup sd card
     Serial.println("Setting up SD storage for sensors");
@@ -52,6 +59,7 @@ void initSensors() {
     gyroData.init("gyrosc");
     ozoneData.init("ozones");
     edvinTimeData.init("edvnin");
+
     float T0 = tempOutdoors.read();
     double P0 = read_pressure();
     heightCalculator.setupHeight(T0,P0);
@@ -59,19 +67,19 @@ void initSensors() {
 
 void readSensors(SensorData& data) {
     // --------------------- Read ----------------------
-    // // time
+    // time
     data.timestamp_ms = timeStamp();
-    // // Temperature
+    // Temperature
     data.insideTemperature = tempIndoors.read();
     data.outsideTemperature= tempOutdoors.read();
-    // // Pressure
+    // Pressure
     data.pressure = read_pressure();
-    // // UV
+    // UV
     data.uv = read_uv();
-    // // Gyro
+    // Gyro
     read_gyro(data.gyro_x,data.gyro_y,data.gyro_z,
               gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);
-    // // Ozone
+    // Ozone
     data.ozone_ppm = read_ozone();
     data.edvinTime = edvinclock.getTime();
     heightCalculator.calculateHeight(data);

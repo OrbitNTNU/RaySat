@@ -7,6 +7,8 @@
 #include "reactionWheel/rwController.h"
 #include "bms/bms.h"
 
+#define DEBUGMODE true
+
 // ----- Class Initilizations -----
 Radio radio;
 SensorData data;
@@ -26,7 +28,8 @@ void setup()
   Serial.begin(9600);
   Serial.println("Initializing...");
   bmsInit();
-  sdSystemInit();
+  sdSystemInit(DEBUGMODE);
+  // Serial.println("----------------------");
   initSensors();
 
   // ------------------- Radio Setup -------------------
@@ -66,7 +69,6 @@ void loop()
   readSensors(data);
   writeSensorData(data);
   // rwController.control(data);
-  // printSensorData(data);
   
   bool rwState = rwController.getState();
   String rwOffOn = rwController.stateToString(rwState);
@@ -91,6 +93,6 @@ void loop()
 
   Serial.println(radio.readFromRadio());
 
-
+  if (DEBUGMODE){printSensorData(data);}
   delay(1000);
 }
