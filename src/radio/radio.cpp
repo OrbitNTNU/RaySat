@@ -13,6 +13,9 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
         //     "p1-pfilter none",
         //     "verbose 3"};
 
+        /*
+        */
+
         std::vector<String> setupCommands = {
             "access always",
             "mode ax25-1k2",  // sets the radio communication protocol
@@ -26,6 +29,10 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
             "mice-symbol /O",
             "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ax25-1k2\\nport-rf-mute 0",
             "autoexec-int " + String(aprsInterval),
+            "tdma-frame 1000",
+            "tx-pos 16",
+            "tx-src 16",
+            "tx-stat 16",
             "baud1 9600",
             "port1 nmea",
             "p1-out none",
@@ -151,7 +158,7 @@ std::pair<int, String> Radio::sendSetupCommand(const String& command)
 
     write(command);
 
-    delay(50);
+    delay(10);
     auto response = readFromRadio();
     
     if (verbose)
@@ -162,7 +169,7 @@ std::pair<int, String> Radio::sendSetupCommand(const String& command)
         Serial.println(response);
     }
 
-    // Hatlosning :))
+    // Exceptions
     if ((std::string(command.c_str()).compare(0, 9, "mice-cmt ") == 0) || 
     (std::string(command.c_str()).compare(0, 13, "autoexec-cmd ") == 0)) {
         return (std::make_pair(0, response));
@@ -206,19 +213,3 @@ String Radio::getModeString(RadioMode mode)
         return "Invalid Mode";
     }
 }
-
-// 2. Sende sensordata
-// 3. Koble gps slik som står på notion
-
-/* Hvordan lese seriellporten til radioen via rasperry pi:
-1. ssh inn (ssh orbit, nå)
-2. ls -l /dev/serial/by-id (/dev/ttyUSB0)
-
-
-Koble til rasperry pi: 
-sudo minicom -b 38400 -o -D /dev/ttyUSB0
-Ctrl + A og Q for å gå ut
-Ctrl + A og Z, og O, serial port, skru av hardware flow control osv
-
-
-*/

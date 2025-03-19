@@ -6,19 +6,17 @@
 #include "radio/radio.h"
 #include "reactionWheel/rwController.h"
 
-// #include "sensors/scanner.h"
-
-
-// ------------------- Class Initilizations -------------------  
+// ----- Class Initilizations -----
 Radio radio;
 SensorData data;
 RWController rwController;
-bool flightMode = false;
 String callSign = "LA9ORB";
+bool flightMode = false;
+bool rwOff = false;
 
 /* --- hvit -> RX, svart -> TX på OBC --- */
 
-// ------------------- Clock Variables -------------------
+// ----- Clock Variables -----
 unsigned long previousMillis;
 const long interval = 5000;
 
@@ -27,13 +25,13 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("Initializing...");
-  // sdSystemInit();
-  Serial.println("----------------------");
+  sdSystemInit();
   initSensors();
 
   // ------------------- Radio Setup -------------------
-  // Serial.println(radio.setup().second);
   radio.mode = RadioMode::unknown;
+
+
   for (int i = 0; i<10; i++) {
     auto radioSetup = radio.setup();
     if (radioSetup.first == -1) {
@@ -46,16 +44,27 @@ void setup()
       break;
     }
   }
+
+
   Serial.println(radio.readFromRadio());
   radio.checkGnssFix();
-  // while (true) {
-  //   auto result = radio.checkGnssFix();
-  //   if (result.first > 0) {
-  //       break;
-  //   }
-  //   else if (result.first ) {}
+  while (true) {
+    auto result = radio.checkGnssFix();
+    if (result.first == 0) {
+        break;
+    }
 
-  // }
+    else if (result.first > 0) {
+      Serial.println("Waiting for a valid GNSS fix...");
+    }
+    
+    else {
+      Serial.println("Erorr in GNSS fix check");
+      break;
+    }
+  }
+
+
   Serial.println("Setup complete");
 
   flightMode = true;
@@ -67,33 +76,36 @@ int i = 0;
 // ------------------- Loop -------------------
 void loop()
 {
-
   readSensors(data);
   writeSensorData(data);
-  rwController.control(data);
-  printSensorData(data);
+  // rwController.control(data);
+  // printSensorData(data);
 
   unsigned long currentMillis = millis();
   if ((currentMillis - previousMillis) >= interval)
   {
     String dataString = transmitSensorData(data);
     auto transmitResult = radio.transmit(callSign + ";" + dataString);
-    Serial.println(callSign + dataString);
+    Serial.println(callSign + ";" + dataString);
     previousMillis = currentMillis;
-    // auto transmitResult = radio.transmit(String(i) + ";1000;0;0;0;50;420;42;50");
-    // auto transmitResult = radio.transmit(String(i) + "Hei Knut :-) Hilsen fra Orbit NTNU!");
-    // Serial.println(String(i) + "Hei Knut :-) Hilsen fra Orbit NTNU!");
-    // Serial.println((String(i) + ";1000;0;0;0;50;420;42;50")); 
+
     if (transmitResult.first == -1) {
       Serial.println("Transmission failed: " + transmitResult.second);
     }
   }
   
+  String incomingMessage = radio.readFromRadio();
+  std::string messageStr = incomingMessage.c_str();
+
+  if (messageStr.find("rwoff") != std::string::npos) {
+    rwOff = true;
+  }
+  if (messageStr.find("rwon") != std::string::npos) {
+    rwOff = false;
+  }
 
   Serial.println(radio.readFromRadio());
-  if (Serial.available()>0) {
-    Serial.println("From radio, here ya go: " + radio.readFromRadio());
-  }
+
   Serial.println(i);
   i++;
   delay(5000);

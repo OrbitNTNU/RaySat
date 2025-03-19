@@ -46,7 +46,7 @@ void initSensors() {
     pressureData.init("pressu");
     ultravioletData.init("violet");
     gyroData.init("gyrosc");
-    ozoneData.init("ozones");
+    // ozoneData.init("ozones");
     float T0 = tempOutdoors.read();
     double P0 = read_pressure();
     heightCalculator.setupHeight(T0,P0);
@@ -67,7 +67,8 @@ void readSensors(SensorData& data) {
     read_gyro(data.gyro_x,data.gyro_y,data.gyro_z,
               gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);
     // Ozone
-    data.ozone_ppm = read_ozone();
+    // data.ozone_ppm = read_ozone();
+    data.ozone_ppm = 30;
     // Height
     heightCalculator.calculateHeight(data);
 }
@@ -85,8 +86,7 @@ void writeSensorData(const SensorData& data) {
 
 String transmitSensorData(const SensorData& data) {
     // --------------------- Send via radio ----------------------
-    String transmitString = data.timestamp_ms+";"+String(data.pressure)+";"+String(data.insideTemperature)+";"+String(data.outsideTemperature)+";"+String(data.uv)+";"+String(data.ozone_ppm)+";"+String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z);
-    // String transmitLine = String(data.outsideTemperature)+"\r\n";
+    String transmitString = data.timestamp_ms+";"+String(data.pressure)+";"+String(data.insideTemperature)+";"+String(data.outsideTemperature)+";"+String(data.uv)+";"+String(data.ozone_ppm)+";"+String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z)+";"+String(data.height);
     return transmitString;
 }
 
@@ -100,7 +100,7 @@ void printSensorData(const SensorData& data) {
     Serial.print("Outdoors temperature Data: "); Serial.println(data.outsideTemperature);
     Serial.print("Inndoors temperature Data: "); Serial.println(data.insideTemperature);
     Serial.print("Gyro X: "); Serial.print(data.gyro_x); 
-    Serial.print(" Gyro Y: "); Serial.print(data.gyro_y);
-    Serial.print(" Gyro Z: "); Serial.println(data.gyro_z);
+    Serial.print("Gyro Y: "); Serial.print(data.gyro_y);
+    Serial.print("Gyro Z: "); Serial.println(data.gyro_z);
     Serial.print("Height: "); Serial.println(data.height);
 }
