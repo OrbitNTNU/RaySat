@@ -34,7 +34,7 @@ void setup()
 
   // ------------------- Radio Setup -------------------
   radio.mode = RadioMode::unknown;
-  // initRadio(radio);
+  radio.initRadio();
   
 
 

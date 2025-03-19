@@ -29,7 +29,7 @@ public:
 
     String readFromRadio(); // Reading from radio
 
-    // void initRadio();
+    void initRadio();
 
 private:
     bool verbose;

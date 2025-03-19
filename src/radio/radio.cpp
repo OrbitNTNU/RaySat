@@ -240,3 +240,18 @@ void Radio::checkIncomingRW(const std::string& messageStr, RWController& rwContr
     rwController.toggleRW();
   }
 }
+
+void Radio::initRadio() {
+  for (int i = 0; i < 10; i++) {
+    auto radioSetup = this->setup();
+    if (radioSetup.first == -1) {
+      Serial.println("Error was caused by radio setup: ");
+      Serial.println(radioSetup.second);
+      Serial.println("Trying again... [" + String(i+1) + "/10]");
+    }
+    else if (radioSetup.first == 0) {
+      Serial.println("Radio configuration successful");
+      break;
+    }
+  }
+}
