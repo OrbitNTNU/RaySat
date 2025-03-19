@@ -33,16 +33,18 @@ created beforehand.
 
 
 */
-void sdSystemInit();
+void sdSystemInit(bool debugMode = false);
 
 class DataObject {
     public:
         // int datatype;
         int fileWrite(String txt,String timestamp);
-        void init(String dataObjectName);
+        void init(String dataObjectName, bool debugMode=false);
     private:
         String name;
+        bool debug;
         int index;
+        void fileWriteTest();
         void newFile();
         int _lineCount = 0;
 };
