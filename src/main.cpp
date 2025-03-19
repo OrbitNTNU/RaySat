@@ -5,6 +5,7 @@
 #include "sensors/sensors.h"
 #include "radio/radio.h"
 #include "reactionWheel/rwController.h"
+#include "bms/bms.h"
 
 // ----- Class Initilizations -----
 Radio radio;
@@ -25,6 +26,7 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("Initializing...");
+  bmsInit();
   sdSystemInit();
   initSensors();
 
