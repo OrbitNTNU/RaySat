@@ -30,7 +30,7 @@ void setup()
   bmsInit();
   sdSystemInit(DEBUGMODE);
   // Serial.println("----------------------");
-  initSensors();
+  initSensors(DEBUGMODE);
 
   // ------------------- Radio Setup -------------------
   radio.mode = RadioMode::unknown;
@@ -71,7 +71,6 @@ void setup()
 
   Serial.println("Setup complete");
 
-  flightMode = true;
   unsigned long startTime = millis();
 }
 

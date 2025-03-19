@@ -22,7 +22,7 @@ struct SensorData {
     int edvinTime;
     SensorData();
 };
-void initSensors();
+void initSensors(bool debugMode);
 void readSensors(SensorData& data);
 void writeSensorData(const SensorData& data);
 String transmitSensorData(const SensorData& data);

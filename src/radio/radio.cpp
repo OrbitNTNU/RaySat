@@ -229,7 +229,7 @@ String Radio::getModeString(const RadioMode& mode)
     }
 }
 
-void checkIncomingRW(const std::string& messageStr, RWController& rwController) {
+void Radio::checkIncomingRW(const std::string& messageStr, RWController& rwController) {
   if (messageStr.find("manual") != std::string::npos) {
     rwController.toggleManual();
   }
