@@ -6,6 +6,7 @@
 #include "gyro.h"
 #include "sd/datastorage.h"
 #include "sensors/clock.h"
+#include "sensors/edvinclock.h"
 
 struct SensorData {
     String timestamp_ms;
@@ -18,6 +19,7 @@ struct SensorData {
     float gyro_y;
     float gyro_z;
     float height;
+    int edvinTime;
     SensorData();
 };
 void initSensors();

@@ -7,9 +7,11 @@ DataObject pressureData;
 DataObject ultravioletData;
 DataObject gyroData;
 DataObject ozoneData;
+DataObject edvinTimeData;
 
 TempSensor tempOutdoors;
 TempSensor tempIndoors;
+EdvinClock edvinclock;
 
 float gyro_calibrated_x;
 float gyro_calibrated_y;
@@ -28,8 +30,9 @@ SensorData::SensorData() {
     gyro_y = 0.0;
     gyro_z = 0.0;
     height = 0.0;
+    edvinTime = 0;
 }
-
+//D8
 void initSensors() {
     // Setup sensors
     Serial.println("Setting up sensors");
@@ -38,15 +41,17 @@ void initSensors() {
     setup_pressure();
     setup_uv();
     calibrate_gyro(2000, gyro_calibrated_x, gyro_calibrated_y, gyro_calibrated_z);
-    // setup_ozone();
-    // setup sd card
+    setup_ozone();
+    edvinclock.init(D8);
+    // // setup sd card
     Serial.println("Setting up SD storage for sensors");
     temperatureOutdoorsData.init("tmpout");
     temperatureInndoorsData.init("tmpinn");
     pressureData.init("pressu");
     ultravioletData.init("violet");
     gyroData.init("gyrosc");
-    // ozoneData.init("ozones");
+    ozoneData.init("ozones");
+    edvinTimeData.init("edvnin");
     float T0 = tempOutdoors.read();
     double P0 = read_pressure();
     heightCalculator.setupHeight(T0,P0);
@@ -54,22 +59,21 @@ void initSensors() {
 
 void readSensors(SensorData& data) {
     // --------------------- Read ----------------------
-    // time
+    // // time
     data.timestamp_ms = timeStamp();
-    // Pressure
-    data.pressure = read_pressure();
-    // Temperature
+    // // Temperature
     data.insideTemperature = tempIndoors.read();
     data.outsideTemperature= tempOutdoors.read();
-    // UV
+    // // Pressure
+    data.pressure = read_pressure();
+    // // UV
     data.uv = read_uv();
-    // Gyro
+    // // Gyro
     read_gyro(data.gyro_x,data.gyro_y,data.gyro_z,
               gyro_calibrated_x,gyro_calibrated_y,gyro_calibrated_z);
-    // Ozone
-    // data.ozone_ppm = read_ozone();
-    data.ozone_ppm = 30;
-    // Height
+    // // Ozone
+    data.ozone_ppm = read_ozone();
+    data.edvinTime = edvinclock.getTime();
     heightCalculator.calculateHeight(data);
 }
 
@@ -81,7 +85,7 @@ void writeSensorData(const SensorData& data) {
     temperatureInndoorsData.fileWrite(String(data.insideTemperature),data.timestamp_ms);
     temperatureOutdoorsData.fileWrite(String(data.outsideTemperature),data.timestamp_ms);
     gyroData.fileWrite(String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z),data.timestamp_ms);
-
+    edvinTimeData.fileWrite(String(data.edvinTime),data.timestamp_ms);
 }
 
 String transmitSensorData(const SensorData& data) {
@@ -100,7 +104,8 @@ void printSensorData(const SensorData& data) {
     Serial.print("Outdoors temperature Data: "); Serial.println(data.outsideTemperature);
     Serial.print("Inndoors temperature Data: "); Serial.println(data.insideTemperature);
     Serial.print("Gyro X: "); Serial.print(data.gyro_x); 
-    Serial.print("Gyro Y: "); Serial.print(data.gyro_y);
-    Serial.print("Gyro Z: "); Serial.println(data.gyro_z);
+    Serial.print(" Gyro Y: "); Serial.print(data.gyro_y);
+    Serial.print(" Gyro Z: "); Serial.println(data.gyro_z);
+    Serial.print("Edvin time: "); Serial.println(data.edvinTime);
     Serial.print("Height: "); Serial.println(data.height);
 }
