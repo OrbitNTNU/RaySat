@@ -2,7 +2,6 @@
 
 // defining pin settings
 // TODO: get propper values here
-#define RWPIN A12
 #define RWON_OUTPUT LOW
 #define RWOFF_OUTPUT HIGH
 
@@ -20,12 +19,26 @@ void RWController::disablecheck_(const SensorData& data) {
     return;
 }
 
+void RWController::init(int pin) {
+    pinMode(controllerPin_,OUTPUT);
+}
+
+void RWController::toggleRW() {
+    if (manual_) {state_ = !state_;}
+}
+void RWController::toggleManual() {
+    manual_ = !manual_;
+}
+
 void RWController::control(const SensorData& data) {
     if (data.height > ASCENDEDHEIGHT) {ascended_ = true;}
-    disablecheck_(data);
-    digitalWrite(RWPIN,RWON_OUTPUT*(state_)+RWOFF_OUTPUT*(!state_));
+    if (!manual_) {disablecheck_(data);}
+    digitalWrite(controllerPin_,RWON_OUTPUT*(state_)+RWOFF_OUTPUT*(!state_));
 }
+
+
 RWController::RWController() {
     state_ = true;
     ascended_ = false;
+    manual_ = false;
 }
