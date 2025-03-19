@@ -96,6 +96,14 @@ void writeSensorData(const SensorData& data) {
     edvinTimeData.fileWrite(String(data.edvinTime),data.timestamp_ms);
 }
 
+String transmitSensorData(const SensorData& data) {
+    // --------------------- Send via radio ----------------------
+    String transmitString = data.timestamp_ms+";"+String(data.pressure)+";"+String(data.insideTemperature)+";"+String(data.outsideTemperature)+";"+String(data.uv)+";"+String(data.ozone_ppm)+";"+String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z)+";"+String(data.height);
+    return transmitString;
+}
+
+
+
 void printSensorData(const SensorData& data) {
     // --------------------- Print ----------------------
     Serial.print("Ozone Data: "); Serial.println(data.ozone_ppm);

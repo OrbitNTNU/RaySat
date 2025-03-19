@@ -1,5 +1,6 @@
 #pragma once
 #include "sensors/sensors.h"
+#include <string>
 
 class RWController {
 private:
@@ -13,5 +14,7 @@ public:
     void init(int pin);
     void toggleManual();
     void toggleRW();
+    bool getState();
+    String stateToString(bool state);
     RWController();
 };
