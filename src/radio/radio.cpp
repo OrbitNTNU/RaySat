@@ -4,30 +4,45 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
 {
         verbose = _verbose;
 
-        
-        // std::vector<String> GNSSCommands = {
-        //     "baud1 9600",
-        //     "port1 nmea",
-        //     "p1-out none",
-        //     "p1-rfilter none",
-        //     "p1-pfilter none",
-        //     "verbose 3"};
-
         /*
+        ---- Radio setup & GNSS commands ----
+        access always
+        mode ngham
+        power mid
+        mycall LA9ORB-11
+        path  
+        freq 144700000
+        mice-cmt SO Test, \vV \tC HDOP\h
+        mice-cmtint 3
+        mice-msg 7
+        mice-symbol /O
+        autoexec-cmd port-rf-mute 1\nmode ax25-1k2\nfreq 144800000\nmice-tx\nfreq 144700000\nmode ngham\nport-rf-mute 0
+        autoexec-int 20
+        tdma-frame 1000
+        tx-pos 16
+        tx-src 16
+        tx-stat 16
+        baud1 9600
+        port1 nmea
+        p1-out none
+        p1-rfilter none
+        p1-pfilter none
+        port0 text
+        verbose 3
         */
 
         std::vector<String> setupCommands = {
             "access always",
-            "mode ax25-1k2",  // sets the radio communication protocol
+            "mode ngham",  // sets the radio communication protocol
             "power mid",    // CHANGE TO HI!!!!!!
             "mycall LA9ORB-11",
             "path  ",
             "freq 144700000", // sets the frequency on the radio TX/RX
-            "mice-cmt SO Test, \\vV \\tC HDOP\\h",
+            "mice-cmt SO VHF, \\vV \\tC HDOP\\h",
             "mice-cmtint 3",
             "mice-msg 7",
             "mice-symbol /O",
-            "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ax25-1k2\\nport-rf-mute 0",
+            "autoexec-cmd port-rf-mute 1\nmode ax25-1k2\nfreq 144800000\nmice-tx\nfreq 144700000\nmode ngham\nport-rf-mute 0",
             "autoexec-int " + String(aprsInterval),
             "tdma-frame 1000",
             "tx-pos 16",
@@ -38,7 +53,7 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
             "p1-out none",
             "p1-rfilter none",
             "p1-pfilter none",
-            "port0 text",  // This prevents airborn mode to be printed
+            "port0 text",
             "verbose 3"
         };
     
@@ -186,7 +201,7 @@ std::pair<int, String> Radio::sendSetupCommand(const String& command)
     return std::make_pair(0, response);
 }
 
-std::pair<int, String> Radio::sendConfiguration(std::vector<String> commandsToSend)
+std::pair<int, String> Radio::sendConfiguration(const std::vector<String>& commandsToSend)
 {
     enterSettingMode();
     for (int i = 0; i < commandsToSend.size(); i++)
@@ -199,7 +214,7 @@ std::pair<int, String> Radio::sendConfiguration(std::vector<String> commandsToSe
     return std::make_pair(0, "");
 }
 
-String Radio::getModeString(RadioMode mode)
+String Radio::getModeString(const RadioMode& mode)
 {
     switch (mode)
     {
@@ -212,4 +227,16 @@ String Radio::getModeString(RadioMode mode)
     default:
         return "Invalid Mode";
     }
+}
+
+void checkIncomingRW(const std::string& messageStr, RWController& rwController) {
+  if (messageStr.find("manual") != std::string::npos) {
+    rwController.toggleManual();
+  }
+  if (messageStr.find("rwoff") != std::string::npos) {
+    rwController.toggleRW();
+  }
+  if (messageStr.find("rwon") != std::string::npos) {
+    rwController.toggleRW();
+  }
 }

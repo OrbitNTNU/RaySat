@@ -36,6 +36,14 @@ void RWController::control(const SensorData& data) {
     digitalWrite(controllerPin_,RWON_OUTPUT*(state_)+RWOFF_OUTPUT*(!state_));
 }
 
+bool RWController::getState() {
+    return state_;
+}
+
+String RWController::stateToString(bool state) {
+    std::unordered_map<bool, String> map = {{true, "on"}, {false, "off"}};
+    return map.at(state);
+}
 
 RWController::RWController() {
     state_ = true;

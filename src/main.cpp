@@ -11,7 +11,7 @@
 Radio radio;
 SensorData data;
 RWController rwController;
-String callSign = "LA9ORB";
+const String callSign = "LA9ORB";
 bool flightMode = false;
 bool rwOff = false;
 
@@ -20,6 +20,7 @@ bool rwOff = false;
 // ----- Clock Variables -----
 unsigned long previousMillis;
 const long interval = 5000;
+
 
 // ------------------- Setup -------------------
 void setup()
@@ -82,13 +83,16 @@ void loop()
   writeSensorData(data);
   // rwController.control(data);
   // printSensorData(data);
+  
+  bool rwState = rwController.getState();
+  String rwOffOn = rwController.stateToString(rwState);
 
   unsigned long currentMillis = millis();
   if ((currentMillis - previousMillis) >= interval)
   {
     String dataString = transmitSensorData(data);
-    auto transmitResult = radio.transmit(callSign + ";" + dataString);
-    Serial.println(callSign + ";" + dataString);
+    auto transmitResult = radio.transmit(callSign + ";" + dataString + ";" + rwOffOn);
+    Serial.println(callSign + ";" + dataString + rwOffOn);
     previousMillis = currentMillis;
 
     if (transmitResult.first == -1) {
@@ -99,12 +103,7 @@ void loop()
   String incomingMessage = radio.readFromRadio();
   std::string messageStr = incomingMessage.c_str();
 
-  if (messageStr.find("rwoff") != std::string::npos) {
-    rwOff = true;
-  }
-  if (messageStr.find("rwon") != std::string::npos) {
-    rwOff = false;
-  }
+  radio.checkIncomingRW(messageStr, rwController);
 
   Serial.println(radio.readFromRadio());
 
