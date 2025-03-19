@@ -8,6 +8,7 @@
 
 // #include "sensors/scanner.h"
 RWController rwController;
+#define DEBUGMODE true
 
 // put function declarations here:
 int myFunction(int, int);
@@ -17,7 +18,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Initializing...");
   bmsInit();
-  sdSystemInit();
+  sdSystemInit(DEBUGMODE);
   // Serial.println("----------------------");
   initSensors();
   Serial.println("Setup complete");
@@ -29,7 +30,7 @@ void loop() {
   readSensors(data);
   writeSensorData(data);
   // rwController.control(data);
-  // printSensorData(data);
+  if (DEBUGMODE){printSensorData(data);}
   delay(1000);
 }
 

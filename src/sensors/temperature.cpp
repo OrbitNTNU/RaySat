@@ -2,12 +2,12 @@
 
 Adafruit_ADT7410 tempsensor = Adafruit_ADT7410();
 
-int TempSensor::init(uint8_t addr) {
-    Serial.println("-----------TEMP-----------");
+int TempSensor::init(uint8_t addr,bool debugMode) {
     Serial.print("Initialising temperature sensor at addr: "); Serial.println(addr);
     sensor = Adafruit_ADT7410();
     if (!sensor.begin(addr)) {
         Serial.print("Couldn't find ADT7410 at addr: "); Serial.println(addr);
+        while (debugMode);
         return 1;
     }
     // Sensor takes 250 ms to get first readings

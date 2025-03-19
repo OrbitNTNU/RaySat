@@ -1,20 +1,18 @@
 #include "Adafruit_LTR390.h"
+#include "sensors/uv.h"
 
 Adafruit_LTR390 ltr = Adafruit_LTR390();
 
-int setup_uv() {
+int setup_uv(bool debugMode) {
     bool begun = ltr.begin();
     delay(1000);
-    Serial.print("UV sensor found: ");Serial.println(begun);
-    // BUG: for some reason, this won't work properly
-    // if (!begun) {
-    //     Serial.println("Couldn't find LTR sensor!");
-    //     delay(100);
-    //     // return 1;
-    // } else {
-    //     Serial.println("Found LTR sensor!");
-
-    // }
+    // Serial.print("UV sensor found: ");Serial.println(begun);
+    if (!begun) {
+        Serial.println("Couldn't find LTR sensor!");
+        while (debugMode);
+    } else {
+        Serial.println("Found LTR sensor!");
+    }
     delay(100);
     Serial.println("continuing to set up UV sensor");
     ltr.setMode(LTR390_MODE_UVS);
