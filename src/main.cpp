@@ -41,19 +41,19 @@ void setup()
   Serial.println(radio.readFromRadio());
   radio.checkGnssFix();
   while (true) {
-    auto result = radio.checkGnssFix();
-    if (result.first == 0) {
-        break;
-    }
+   auto result = radio.checkGnssFix();
+   if (result.first == 0) {
+       break;
+   }
 
-    else if (result.first > 0) {
-      Serial.println("Waiting for a valid GNSS fix...");
-    }
-    
-    else {
-      Serial.println("Error in GNSS fix check");
-      break;
-    }
+   else if (result.first > 0) {
+     Serial.println("Waiting for a valid GNSS fix...");
+   }
+   
+   else {
+     Serial.println("Error in GNSS fix check");
+     break;
+   }
   }
 
 
@@ -79,8 +79,8 @@ void loop()
   if ((currentMillis - previousMillis) >= interval)
   {
     String dataString = transmitSensorData(data);
-    auto transmitResult = radio.transmit(callSign + ";" + dataString + ";" + rwOffOn + ";");
-    Serial.println(callSign + ";" + dataString + rwOffOn);
+    auto transmitResult = radio.transmit(callSign + ";" + dataString + ";" + rwOffOn + ";" + manualOnOff);
+    Serial.println(callSign + ";" + dataString + ";" + rwOffOn);
 
     // auto transmitResult = radio.transmit(callSign + ";" + "10000;1000;23;23;0;30;1;1;1;100;3" + ";" + "rwOn" + ";");
     // Serial.println(callSign + ";" + "10000;1000;23;23;0;30;1;1;1;100;3" + ";" + "rwOn" + ";");
