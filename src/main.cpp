@@ -35,39 +35,11 @@ void setup()
 
   // ------------------- Radio Setup -------------------
   radio.mode = RadioMode::unknown;
-
-
-  for (int i = 0; i<10; i++) {
-    auto radioSetup = radio.setup();
-    if (radioSetup.first == -1) {
-      Serial.println("Error was caused by radio setup: ");
-      Serial.println(radioSetup.second);
-      Serial.println("Trying again... [" + String(i+1) + "/10]");
-    }
-    else if (radioSetup.first == 0) {
-      Serial.println("Radio configuration successful");
-      break;
-    }
-  }
-
-
+  radio.initRadio();
+  
   Serial.println(radio.readFromRadio());
   radio.checkGnssFix();
-  while (true) {
-    auto result = radio.checkGnssFix();
-    if (result.first == 0) {
-        break;
-    }
-
-    else if (result.first > 0) {
-      Serial.println("Waiting for a valid GNSS fix...");
-    }    
-    
-    else {
-      Serial.println("Erorr in GNSS fix check");
-      break;
-    }
-  }
+  radio.gnssFixInit();
 
 
   Serial.println("Setup complete");
@@ -81,16 +53,22 @@ void loop()
 {
   readSensors(data);
   writeSensorData(data);
+  rwController.control(data);
   
   bool rwState = rwController.getState();
   String rwOffOn = rwController.stateToString(rwState);
+  bool rwManual = rwController.getManual();
+  String manualOnOff = rwController.manualToString(rwManual); 
 
   unsigned long currentMillis = millis();
   if ((currentMillis - previousMillis) >= interval)
   {
     String dataString = transmitSensorData(data);
-    auto transmitResult = radio.transmit(callSign + ";" + dataString + ";" + rwOffOn);
-    Serial.println(callSign + ";" + dataString + rwOffOn);
+    auto transmitResult = radio.transmit(callSign + ";" + dataString + ";" + rwOffOn + ";" + manualOnOff);
+    Serial.println(callSign + ";" + dataString + ";" + rwOffOn);
+
+    // auto transmitResult = radio.transmit(callSign + ";" + "10000;1000;23;23;0;30;1;1;1;100;3" + ";" + "rwOn" + ";");
+    // Serial.println(callSign + ";" + "10000;1000;23;23;0;30;1;1;1;100;3" + ";" + "rwOn" + ";");
     previousMillis = currentMillis;
 
     if (transmitResult.first == -1) {

@@ -19,7 +19,7 @@ class Radio
 {
 public:
     RadioMode mode = RadioMode::unknown;
-    
+
     std::pair<int, String> setup(int aprsInterval = 20, bool _verbose = true);
     std::pair<int, String> enterTransmitMode();
     void enterSettingMode();
@@ -28,10 +28,16 @@ public:
     void checkIncomingRW(const std::string& messageStr, RWController& rwController);
 
     String readFromRadio(); // Reading from radio
+
+    void initRadio();
+
+    bool gnssFixInit();
+
 private:
     bool verbose;
     bool gnssFix = false;
     HardwareSerial radioSerial{PC5, PC4}; // Uart pins to radio (D1=TX/D0=RX on CN9)
+    // HardwareSerial radioSerial{D0, D1};
 
     std::pair<int, String> sendSetupCommand(const String& command);
     std::pair<int, String> sendConfiguration(const std::vector<String>& commandsToSend);
@@ -40,4 +46,5 @@ private:
 
     void sendCtrlC();
     void write(const String& message);
+
 };

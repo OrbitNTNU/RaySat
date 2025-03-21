@@ -42,7 +42,7 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
             "mice-cmtint 3",
             "mice-msg 7",
             "mice-symbol /O",
-            "autoexec-cmd port-rf-mute 1\nmode ax25-1k2\nfreq 144800000\nmice-tx\nfreq 144700000\nmode ngham\nport-rf-mute 0",
+            "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ngham\\nport-rf-mute 0",
             "autoexec-int " + String(aprsInterval),
             "tdma-frame 1000",
             "tx-pos 16",
@@ -239,4 +239,37 @@ void Radio::checkIncomingRW(const std::string& messageStr, RWController& rwContr
   if (messageStr.find("rwon") != std::string::npos) {
     rwController.toggleRW();
   }
+}
+
+void Radio::initRadio() {
+  for (int i = 0; i < 10; i++) {
+    auto radioSetup = this->setup();
+    if (radioSetup.first == -1) {
+      Serial.println("Error was caused by radio setup: ");
+      Serial.println(radioSetup.second);
+      Serial.println("Trying again... [" + String(i+1) + "/10]");
+    }
+    else if (radioSetup.first == 0) {
+      Serial.println("Radio configuration successful");
+      break;
+    }
+  }
+}
+
+bool Radio::gnssFixInit() {
+    while (true) {
+        auto result = this->checkGnssFix();
+        if (result.first == 0) {
+            break;
+        }
+
+        else if (result.first > 0) {
+            Serial.println("Waiting for a valid GNSS fix...");
+        }
+
+        else {
+            Serial.println("Error in GNSS fix check");
+            break;
+        }
+    }
 }
