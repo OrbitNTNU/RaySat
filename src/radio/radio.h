@@ -31,6 +31,8 @@ public:
 
     void initRadio();
 
+    bool gnssFixInit();
+
 private:
     bool verbose;
     bool gnssFix = false;

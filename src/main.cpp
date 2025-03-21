@@ -37,25 +37,9 @@ void setup()
   radio.mode = RadioMode::unknown;
   radio.initRadio();
   
-
-
   Serial.println(radio.readFromRadio());
   radio.checkGnssFix();
-  while (true) {
-   auto result = radio.checkGnssFix();
-   if (result.first == 0) {
-       break;
-   }
-
-   else if (result.first > 0) {
-     Serial.println("Waiting for a valid GNSS fix...");
-   }
-   
-   else {
-     Serial.println("Error in GNSS fix check");
-     break;
-   }
-  }
+  radio.gnssFixInit();
 
 
   Serial.println("Setup complete");

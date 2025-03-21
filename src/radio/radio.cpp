@@ -255,3 +255,21 @@ void Radio::initRadio() {
     }
   }
 }
+
+bool Radio::gnssFixInit() {
+    while (true) {
+        auto result = this->checkGnssFix();
+        if (result.first == 0) {
+            break;
+        }
+
+        else if (result.first > 0) {
+            Serial.println("Waiting for a valid GNSS fix...");
+        }
+
+        else {
+            Serial.println("Error in GNSS fix check");
+            break;
+        }
+    }
+}
