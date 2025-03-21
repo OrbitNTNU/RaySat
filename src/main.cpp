@@ -29,6 +29,7 @@ void setup()
   Serial.println("Initializing...");
   bmsInit();
   sdSystemInit(DEBUGMODE);
+  rwController.init(D2);
   Serial.println("----------------------");
   initSensors(DEBUGMODE);
 

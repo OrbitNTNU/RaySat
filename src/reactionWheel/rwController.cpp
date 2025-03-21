@@ -20,6 +20,7 @@ void RWController::disablecheck_(const SensorData& data) {
 }
 
 void RWController::init(int pin) {
+    controllerPin_ = pin;
     pinMode(controllerPin_,OUTPUT);
 }
 
@@ -33,7 +34,11 @@ void RWController::toggleManual() {
 void RWController::control(const SensorData& data) {
     if (data.height > ASCENDEDHEIGHT) {ascended_ = true;}
     if (!manual_) {disablecheck_(data);}
-    digitalWrite(controllerPin_,RWON_OUTPUT*(state_)+RWOFF_OUTPUT*(!state_));
+    if (state_) {
+        digitalWrite(controllerPin_,RWON_OUTPUT);
+    } else {
+        digitalWrite(controllerPin_,RWOFF_OUTPUT);
+    }
 }
 
 bool RWController::getState() {
