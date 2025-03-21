@@ -15,6 +15,8 @@ public:
     void toggleManual();
     void toggleRW();
     bool getState();
+    bool getManual();
     String stateToString(bool state);
+    String manualToString(bool manual);
     RWController();
 };

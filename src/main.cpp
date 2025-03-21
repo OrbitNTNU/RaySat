@@ -29,7 +29,7 @@ void setup()
   Serial.println("Initializing...");
   bmsInit();
   sdSystemInit(DEBUGMODE);
-  // Serial.println("----------------------");
+  Serial.println("----------------------");
   initSensors(DEBUGMODE);
 
   // ------------------- Radio Setup -------------------
@@ -51,7 +51,7 @@ void setup()
     }
     
     else {
-      Serial.println("Erorr in GNSS fix check");
+      Serial.println("Error in GNSS fix check");
       break;
     }
   }
@@ -68,17 +68,22 @@ void loop()
 {
   readSensors(data);
   writeSensorData(data);
-  // rwController.control(data);
+  rwController.control(data);
   
   bool rwState = rwController.getState();
   String rwOffOn = rwController.stateToString(rwState);
+  bool rwManual = rwController.getManual();
+  String manualOnOff = rwController.manualToString(rwManual); 
 
   unsigned long currentMillis = millis();
   if ((currentMillis - previousMillis) >= interval)
   {
     String dataString = transmitSensorData(data);
-    auto transmitResult = radio.transmit(callSign + ";" + dataString + ";" + rwOffOn);
+    auto transmitResult = radio.transmit(callSign + ";" + dataString + ";" + rwOffOn + ";");
     Serial.println(callSign + ";" + dataString + rwOffOn);
+
+    // auto transmitResult = radio.transmit(callSign + ";" + "10000;1000;23;23;0;30;1;1;1;100;3" + ";" + "rwOn" + ";");
+    // Serial.println(callSign + ";" + "10000;1000;23;23;0;30;1;1;1;100;3" + ";" + "rwOn" + ";");
     previousMillis = currentMillis;
 
     if (transmitResult.first == -1) {

@@ -45,8 +45,18 @@ String RWController::stateToString(bool state) {
     return map.at(state);
 }
 
+bool RWController::getManual() {
+    return manual_;
+}
+
+String RWController::manualToString(bool manual) {
+    std::unordered_map<bool, String> map = {{true, "on"}, {false, "off"}};
+    return map.at(manual);
+}
+
 RWController::RWController() {
     state_ = true;
     ascended_ = false;
     manual_ = false;
 }
+

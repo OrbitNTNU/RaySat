@@ -61,4 +61,5 @@ uint32_t read_uv() {
         // Serial.println(uv);
         return uv;
     }
+    return 0;
 }

@@ -42,7 +42,7 @@ std::pair<int, String> Radio::setup(int aprsInterval /*= 20*/, bool _verbose /*=
             "mice-cmtint 3",
             "mice-msg 7",
             "mice-symbol /O",
-            "autoexec-cmd port-rf-mute 1\nmode ax25-1k2\nfreq 144800000\nmice-tx\nfreq 144700000\nmode ngham\nport-rf-mute 0",
+            "autoexec-cmd port-rf-mute 1\\nmode ax25-1k2\\nfreq 144800000\\nmice-tx\\nfreq 144700000\\nmode ngham\\nport-rf-mute 0",
             "autoexec-int " + String(aprsInterval),
             "tdma-frame 1000",
             "tx-pos 16",

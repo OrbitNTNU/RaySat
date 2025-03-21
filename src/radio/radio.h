@@ -35,6 +35,7 @@ private:
     bool verbose;
     bool gnssFix = false;
     HardwareSerial radioSerial{PC5, PC4}; // Uart pins to radio (D1=TX/D0=RX on CN9)
+    // HardwareSerial radioSerial{D0, D1};
 
     std::pair<int, String> sendSetupCommand(const String& command);
     std::pair<int, String> sendConfiguration(const std::vector<String>& commandsToSend);
