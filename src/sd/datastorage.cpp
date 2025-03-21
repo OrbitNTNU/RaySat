@@ -39,12 +39,12 @@ void sdSystemInit(bool debugMode) {
 }
 
 void DataObject::fileWriteTest() {
-    String path = name+"/"+name+"_test.txt";
+    String path = name+"/"+"test.txt";
     File file = SD.open(path,FILE_WRITE);
     if (file) {
         file.close();
     } else {
-        Serial.print("error opening the file when trying to write  to test file");
+        Serial.println("error opening the file when trying to write  to test file");
         while (debug);
     }
 }

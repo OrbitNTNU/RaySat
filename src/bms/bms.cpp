@@ -8,10 +8,13 @@
 void bmsInit() {
     pinMode(IGN_pin, OUTPUT);
     digitalWrite(IGN_pin, HIGH);
+
     pinMode(PS_pin, OUTPUT);
     digitalWrite(PS_pin, HIGH);
+
     pinMode(IGN_PWRL_pin, OUTPUT);
     digitalWrite(IGN_PWRL_pin, HIGH);
+
     pinMode(SS_EN_pin, OUTPUT);
     digitalWrite(SS_EN_pin, HIGH);
 }

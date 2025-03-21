@@ -29,7 +29,8 @@ void setup()
   Serial.println("Initializing...");
   bmsInit();
   sdSystemInit(DEBUGMODE);
-  // Serial.println("----------------------");
+  rwController.init(D2);
+  Serial.println("----------------------");
   initSensors(DEBUGMODE);
 
   // ------------------- Radio Setup -------------------
@@ -60,7 +61,7 @@ void setup()
 
     else if (result.first > 0) {
       Serial.println("Waiting for a valid GNSS fix...");
-    }
+    }    
     
     else {
       Serial.println("Erorr in GNSS fix check");
@@ -80,7 +81,6 @@ void loop()
 {
   readSensors(data);
   writeSensorData(data);
-  // rwController.control(data);
   
   bool rwState = rwController.getState();
   String rwOffOn = rwController.stateToString(rwState);

@@ -8,6 +8,7 @@ DataObject ultravioletData;
 DataObject gyroData;
 DataObject ozoneData;
 DataObject edvinTimeData;
+DataObject heightData;
 
 TempSensor tempOutdoors;
 TempSensor tempIndoors;
@@ -59,6 +60,7 @@ void initSensors(bool debugMode) {
     gyroData.init("gyrosc");
     ozoneData.init("ozones");
     edvinTimeData.init("edvnin");
+    heightData.init("height");
 
     float T0 = tempOutdoors.read();
     double P0 = read_pressure();
@@ -94,6 +96,7 @@ void writeSensorData(const SensorData& data) {
     temperatureOutdoorsData.fileWrite(String(data.outsideTemperature),data.timestamp_ms);
     gyroData.fileWrite(String(data.gyro_x)+";"+String(data.gyro_y)+";"+String(data.gyro_z),data.timestamp_ms);
     edvinTimeData.fileWrite(String(data.edvinTime),data.timestamp_ms);
+    heightData.fileWrite(String(data.height),data.timestamp_ms);
 }
 
 String transmitSensorData(const SensorData& data) {
